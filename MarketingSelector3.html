@@ -1,0 +1,1078 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Support Plan Builder — L1 to L4</title>
+
+  <style>
+    :root{
+      --bg:#0B1220;
+      --card:#111B2E;
+      --muted:#A7B6CF;
+      --text:#E6EEF9;
+      --border:#22304A;
+      --accent:#6AA6FF;
+      --good:#36D399;
+      --warn:#FBBF24;
+      --bad:#FB7185;
+
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --glassTop: rgba(255,255,255,.05);
+      --glassBot: rgba(255,255,255,.02);
+      --panelBg: rgba(0,0,0,.20);
+      --inputBg: rgba(0,0,0,.28);
+    }
+
+    html[data-theme="light"]{
+      --bg:#F6F8FC;
+      --card:#FFFFFF;
+      --muted:#475569;
+      --text:#0F172A;
+      --border:#E6EAF2;
+      --accent:#2563EB;
+      --good:#16A34A;
+      --warn:#D97706;
+      --bad:#DC2626;
+
+      --shadow: 0 14px 40px rgba(15,23,42,.10);
+      --glassTop: rgba(15,23,42,.03);
+      --glassBot: rgba(15,23,42,.02);
+      --panelBg: rgba(15,23,42,.03);
+      --inputBg: rgba(15,23,42,.03);
+    }
+
+    *{ box-sizing:border-box }
+    :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 20% 0%, rgba(106,166,255,.20) 0%, transparent 58%),
+        radial-gradient(1000px 650px at 85% 15%, rgba(54,211,153,.12) 0%, transparent 60%),
+        var(--bg);
+      line-height:1.45;
+    }
+
+    .wrap{ max-width:1060px; margin:0 auto; padding:26px 18px 44px; }
+
+    header{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .titleBlock b{ display:block; font-size:14px; letter-spacing:.2px; }
+    .titleBlock span{ display:block; font-size:12px; color:var(--muted); margin-top:2px; }
+
+    button{
+      border:1px solid var(--border);
+      background: color-mix(in oklab, var(--accent) 16%, transparent);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:12px;
+      transition: border-color .15s ease, transform .05s ease, background .15s ease;
+    }
+    button.secondary{ background: var(--panelBg) }
+    button:hover{ border-color: color-mix(in oklab, var(--border) 60%, white) }
+    button:active{ transform: translateY(1px) }
+
+    .card{
+      background: linear-gradient(180deg, var(--glassTop), var(--glassBot));
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+
+    .rowCard{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: var(--panelBg);
+      padding:14px;
+      display:grid;
+      grid-template-columns: 56px 1fr 340px;
+      gap:14px;
+      align-items:center;
+      margin-top:12px;
+    }
+    @media (max-width:980px){
+      .rowCard{ grid-template-columns: 56px 1fr; }
+      .rightCol{ grid-column: 1 / -1; }
+    }
+
+    .lvl{
+      width:56px; height:56px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; letter-spacing:.3px;
+      flex-direction:column;
+      gap:2px;
+    }
+    .lvl span{ line-height:1; }
+    .lvl small{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      font-weight:600;
+      letter-spacing:.2px;
+      text-align:center;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:20px;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+    .sub{ margin:0; color:var(--muted); font-size:13px; }
+
+    .leftCol h2{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .leftCol p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .selectRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+
+    .toggle{
+      display:flex; align-items:center; gap:10px;
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(0,0,0,.10);
+    }
+    html[data-theme="light"] .toggle{ background: rgba(15,23,42,.02); }
+    .toggle input{ margin:0; }
+
+    .rightCol{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      justify-self:end;
+      width:100%;
+      max-width:340px;
+    }
+    @media (max-width:980px){
+      .rightCol{ justify-self:stretch; max-width:none; }
+    }
+
+    .rightCol label{
+      font-size:12px;
+      color:var(--muted);
+      display:block;
+      margin-bottom:6px;
+    }
+
+    .pillGroup{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.12);
+      color: var(--text);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition: background .15s ease, border-color .15s ease, transform .05s ease;
+      min-width: 86px;
+      text-align:center;
+    }
+    html[data-theme="light"] .pill{ background: rgba(15,23,42,.03); }
+
+    .pill:hover{ border-color: color-mix(in oklab, var(--border) 60%, white); }
+    .pill:active{ transform: translateY(1px); }
+
+    .pill[data-selected="true"]{
+      background: color-mix(in oklab, var(--accent) 18%, transparent);
+      border-color: color-mix(in oklab, var(--accent) 50%, var(--border));
+    }
+
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .hr{ height:1px; background:var(--border); margin:16px 0; }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: var(--panelBg);
+      overflow:hidden;
+    }
+    th, td{
+      padding:10px;
+      border-bottom:1px solid var(--border);
+      font-size:12px;
+      vertical-align:top;
+    }
+    th{
+      text-align:left;
+      color: color-mix(in oklab, var(--text) 92%, transparent);
+      background: color-mix(in oklab, var(--panelBg) 40%, transparent);
+      font-weight:600;
+    }
+    tr:last-child td{ border-bottom:none }
+
+    .note{ font-size:12px; color:var(--muted) }
+
+    .summaryBox{
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:14px;
+      align-items:start;
+      margin-top:14px;
+    }
+    @media (max-width:980px){
+      .summaryBox{ grid-template-columns:1fr; }
+    }
+
+    textarea{
+      width:100%;
+      border:1px solid var(--border);
+      background: var(--inputBg);
+      color: var(--text);
+      border-radius:12px;
+      padding:10px;
+      outline:none;
+      min-height:190px;
+      resize:vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+    }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+
+    .bigPrice{
+      font-size:26px;
+      margin:0;
+      line-height:1;
+      letter-spacing:.2px;
+    }
+    .bigPrice small{
+      display:block;
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .pillRow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .miniPill{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--border);
+      background: var(--panelBg);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .miniPill b{ color:var(--text); font-weight:600; }
+
+    .mutedBox{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: var(--panelBg);
+      padding:12px;
+    }
+
+    /* NEW: intake block */
+    .intakeGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    @media (max-width:800px){ .intakeGrid{ grid-template-columns:1fr; } }
+
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    input[type="number"], input[type="text"], select{
+      width:100%;
+      border:1px solid var(--border);
+      background: var(--inputBg);
+      color: var(--text);
+      border-radius:12px;
+      padding:10px;
+      outline:none;
+    }
+
+    .tzBox{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(0,0,0,.10);
+      padding:10px;
+    }
+    html[data-theme="light"] .tzBox{ background: rgba(15,23,42,.02); }
+
+    .tzPills{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+
+    .tzPill{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.12);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      cursor:pointer;
+      user-select:none;
+    }
+    html[data-theme="light"] .tzPill{ background: rgba(15,23,42,.03); }
+    .tzPill[data-selected="true"]{
+      color: var(--text);
+      background: color-mix(in oklab, var(--accent) 16%, transparent);
+      border-color: color-mix(in oklab, var(--accent) 50%, var(--border));
+    }
+
+    .riskLine{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .riskLine b{ color:var(--text); font-weight:600; }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div class="titleBlock">
+      <b>NAV / Business Central Support — SLA Builder</b>
+      <span>Start with environment scale. Then select L1–L4 and response expectations.</span>
+    </div>
+    <button id="themeToggle" class="secondary" type="button" aria-label="Toggle light/dark mode">Light mode</button>
+  </header>
+
+  <section class="card">
+    <h1>1) Tell us the scale of your environment</h1>
+    <p class="sub">
+      Response expectations that work for 10 users often don’t work for 300+ users. These inputs adjust the indicative estimate and help set realistic SLAs.
+    </p>
+
+    <div class="intakeGrid" aria-label="Environment intake">
+      <div class="field">
+        <label for="licensedUsers">Licensed users</label>
+        <input id="licensedUsers" type="number" min="1" step="1" value="25" />
+      </div>
+
+      <div class="field">
+        <label for="companies">Number of companies (BC companies / NAV companies)</label>
+        <input id="companies" type="number" min="1" step="1" value="1" />
+      </div>
+
+      <div class="field">
+        <label for="countries">Countries in scope (distinct regulatory / operational regions)</label>
+        <input id="countries" type="number" min="1" step="1" value="1" />
+      </div>
+
+      <div class="field">
+        <label for="supportWindow">Primary support window (baseline)</label>
+        <select id="supportWindow">
+          <option value="uk" selected>Mon–Fri 09:00–17:30 (UK)</option>
+          <option value="emea">Mon–Fri 08:00–18:00 (EMEA)</option>
+          <option value="followTheSun">Follow-the-sun (multiple timezones)</option>
+        </select>
+      </div>
+
+      <div class="field" style="grid-column: 1 / -1;">
+        <div class="tzBox">
+          <label style="margin:0;">Active timezones</label>
+          <div class="tzPills" id="tzPills" aria-label="Timezone selection">
+            <div class="tzPill" tabindex="0" data-tz="UK" data-selected="true">UK</div>
+            <div class="tzPill" tabindex="0" data-tz="Europe">Europe</div>
+            <div class="tzPill" tabindex="0" data-tz="MiddleEast">Middle East</div>
+            <div class="tzPill" tabindex="0" data-tz="India">India</div>
+            <div class="tzPill" tabindex="0" data-tz="APAC">APAC</div>
+            <div class="tzPill" tabindex="0" data-tz="US-East">US East</div>
+            <div class="tzPill" tabindex="0" data-tz="US-West">US West</div>
+          </div>
+          <div class="riskLine" id="scaleHint"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <h1>2) Choose your support lanes</h1>
+    <p class="sub">
+      L1–L2 cover incidents and operational support. L3 covers development/changes. L4 covers proactive governance and planning.
+      Response targets apply within the selected window unless explicitly agreed otherwise.
+    </p>
+
+    <!-- L1 -->
+    <div class="rowCard" data-level="L1">
+      <div class="lvl" aria-label="Level 1">
+        <span>L1</span>
+        <small>Ops</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Level 1 — Service Desk & Triage</h2>
+        <p>
+          First line handling for “how-to”, user issues, posting errors with known workarounds, basic permissions and setup checks,
+          ticket hygiene, and escalation packs (repro steps, screenshots, sample data) for L2/L3.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableL1" checked />
+            <span><b>Select L1</b></span>
+          </label>
+          <span class="hint">Best for: reducing noise and getting clean specs/escalations.</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>L1 response target (first acknowledgement)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="L1 response target">
+            <div class="pill" role="radio" tabindex="0" data-level="L1" data-type="response" data-value="1h">1 hour</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L1" data-type="response" data-value="sameDay" data-selected="true">Same day</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L1" data-type="response" data-value="nextDay">Next day</div>
+          </div>
+        </div>
+        <div class="hint">Includes: ticket triage + next action. Excludes: new development/change requests.</div>
+      </div>
+    </div>
+
+    <!-- L2 -->
+    <div class="rowCard" data-level="L2">
+      <div class="lvl" aria-label="Level 2">
+        <span>L2</span>
+        <small>Inc</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Level 2 — Application Support (Functional/Technical)</h2>
+        <p>
+          Incident investigation beyond L1: deeper NAV/BC functional troubleshooting, data fixes, configuration changes,
+          liaison with key users, and vendor/ISV coordination where appropriate.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableL2" />
+            <span><b>Select L2</b></span>
+          </label>
+          <span class="hint">Best for: business-critical operational incidents and complex functional issues.</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>L2 response target (P1/P2 incidents)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="L2 response target">
+            <div class="pill" role="radio" tabindex="0" data-level="L2" data-type="response" data-value="2h">2 hours</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L2" data-type="response" data-value="4h" data-selected="true">4 hours</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L2" data-type="response" data-value="nextDay">Next day</div>
+          </div>
+        </div>
+        <div class="hint">P1/P2 response targets; P3/P4 handled in queue unless bundled with L1.</div>
+      </div>
+    </div>
+
+    <!-- L3 -->
+    <div class="rowCard" data-level="L3">
+      <div class="lvl" aria-label="Level 3">
+        <span>L3</span>
+        <small>Dev</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Level 3 — Development & Changes</h2>
+        <p>
+          New features, enhancements, integrations, reports, and code-level fixes. Requires a minimum spec pack
+          (goal, scope, acceptance criteria, test scenarios). Work is scheduled; “start now” requests are handled as Emergency Change.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableL3" />
+            <span><b>Select L3</b></span>
+          </label>
+          <span class="hint">Best for: controlled change delivery, predictable delivery cadence.</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>L3 delivery cadence (for change requests)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="L3 cadence">
+            <div class="pill" role="radio" tabindex="0" data-level="L3" data-type="cadence" data-value="day">Day</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L3" data-type="cadence" data-value="week" data-selected="true">Week</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L3" data-type="cadence" data-value="month">Month</div>
+          </div>
+        </div>
+        <div class="hint">Cadence means: typical cycle time target for planned work (not incident response).</div>
+      </div>
+    </div>
+
+    <!-- L4 -->
+    <div class="rowCard" data-level="L4">
+      <div class="lvl" aria-label="Level 4">
+        <span>L4</span>
+        <small>Gov</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Level 4 — Proactive Governance & Roadmap</h2>
+        <p>
+          Prevents “everything is urgent”: demand shaping, backlog triage, architectural guidance, quarterly planning,
+          release governance, vendor management, and making specs/test packs good enough that dev is not guesswork.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableL4" />
+            <span><b>Select L4</b></span>
+          </label>
+          <span class="hint">Best for: reducing firefighting and improving quality of requests/specs.</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>L4 review cadence (governance rhythm)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="L4 cadence">
+            <div class="pill" role="radio" tabindex="0" data-level="L4" data-type="cadence" data-value="week" data-selected="true">Week</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L4" data-type="cadence" data-value="month">Month</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L4" data-type="cadence" data-value="quarter">Quarter</div>
+          </div>
+        </div>
+        <div class="hint">Cadence sets the rhythm for backlog review, roadmap, and release governance.</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- Summary + Estimate -->
+    <div class="summaryBox">
+      <div class="mutedBox">
+        <h2 style="margin:0; font-size:14px; letter-spacing:.2px;">SLA snapshot</h2>
+        <p class="note" style="margin:8px 0 0;">
+          Response targets apply to L1/L2 tickets. Cadence targets apply to L3/L4 planned work.
+        </p>
+        <div id="slaTable" style="margin-top:10px;"></div>
+
+        <p class="note" style="margin-top:10px;">
+          Boundary conditions: L1/L2 do not include new development; L3 requires a spec pack; “start now” development is Emergency Change.
+        </p>
+      </div>
+
+      <div class="mutedBox">
+        <h2 style="margin:0; font-size:14px; letter-spacing:.2px;">Indicative estimate</h2>
+        <p class="bigPrice" id="price">£—<small>ex VAT • scaled to your inputs</small></p>
+        <div class="pillRow" id="chips"></div>
+
+        <div class="hr"></div>
+
+        <h2 style="margin:0; font-size:14px; letter-spacing:.2px;">Configuration summary</h2>
+        <textarea id="summary" readonly></textarea>
+
+        <div class="actions">
+          <button id="copySummary" type="button">Copy summary</button>
+          <button id="copyMailto" class="secondary" type="button">Copy mailto link</button>
+          <button id="openMailto" class="secondary" type="button">Open email client</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<script>
+  // --- Theme toggle (dark default, remembered) ---
+  (function themeInit(){
+    const KEY = "ui-theme";
+    const btn = document.getElementById("themeToggle");
+    function setTheme(theme){
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem(KEY, theme);
+      btn.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+    }
+    const saved = localStorage.getItem(KEY);
+    setTheme(saved === "light" ? "light" : "dark");
+    btn.addEventListener("click", () => {
+      const current = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+      setTheme(current === "dark" ? "light" : "dark");
+    });
+  })();
+
+  // =========================
+  // PRICING / SCALING (edit)
+  // =========================
+  const PRICING = {
+    baseRate: 100, // anchor
+    serviceWindowText: {
+      uk: "Mon–Fri 09:00–17:30 (UK)",
+      emea: "Mon–Fri 08:00–18:00 (EMEA)",
+      followTheSun: "Follow-the-sun (multiple timezones)"
+    },
+
+    // Base monthly fee per level (before multipliers)
+    levelBase: { L1: 350, L2: 650, L3: 0, L4: 450 },
+
+    // Response multipliers
+    responseMult: {
+      L1: { "1h": 2.0, sameDay: 1.4, nextDay: 1.0 },
+      L2: { "2h": 1.6, "4h": 1.2, nextDay: 1.0 }
+    },
+
+    // Cadence multipliers (planned work / governance)
+    cadenceMult: {
+      L3: { day: 1.8, week: 1.2, month: 1.0 },
+      L4: { week: 1.4, month: 1.1, quarter: 1.0 }
+    },
+
+    // NEW: scale multipliers
+    // Users: above 25 users, price increases gradually.
+    // Companies/Countries/Timezones: each adds coordination overhead.
+    scale: {
+      usersBaseline: 25,
+      usersStep: 25,
+      usersStepMult: 0.10,       // +10% per +25 users over baseline
+      companiesBaseline: 1,
+      companyExtraMult: 0.08,    // +8% per additional company
+      countriesBaseline: 1,
+      countryExtraMult: 0.10,    // +10% per additional country
+      timezoneExtraMult: 0.07,   // +7% per additional timezone selected (beyond 1)
+      followTheSunMult: 1.35     // if follow-the-sun selected
+    },
+
+    // Email
+    defaultEmail: "support@yourdomain.tld"
+  };
+
+  // =========================
+  // STATE
+  // =========================
+  const state = {
+    intake: {
+      users: 25,
+      companies: 1,
+      countries: 1,
+      window: "uk",
+      timezones: ["UK"]
+    },
+    enabled: { L1: true, L2: false, L3: false, L4: false },
+    response: { L1: "sameDay", L2: "4h" },
+    cadence: { L3: "week", L4: "week" }
+  };
+
+  // --- DOM (intake) ---
+  const elUsers = document.getElementById("licensedUsers");
+  const elCompanies = document.getElementById("companies");
+  const elCountries = document.getElementById("countries");
+  const elWindow = document.getElementById("supportWindow");
+  const elScaleHint = document.getElementById("scaleHint");
+
+  // --- Helpers ---
+  function money(n){
+    const x = Number(n || 0);
+    return "£" + x.toLocaleString("en-GB", { maximumFractionDigits: 0 });
+  }
+
+  function setSelected(level, type, value){
+    const selector = `.pill[data-level="${level}"][data-type="${type}"]`;
+    document.querySelectorAll(selector).forEach(p => p.dataset.selected = "false");
+    const el = document.querySelector(`.pill[data-level="${level}"][data-type="${type}"][data-value="${value}"]`);
+    if(el) el.dataset.selected = "true";
+  }
+
+  function labelResponseL1(v){
+    if(v === "1h") return "1 hour";
+    if(v === "sameDay") return "Same day";
+    return "Next day";
+  }
+  function labelResponseL2(v){
+    if(v === "2h") return "2 hours";
+    if(v === "4h") return "4 hours";
+    return "Next day";
+  }
+  function labelCadence(v){
+    if(v === "day") return "Day";
+    if(v === "week") return "Week";
+    if(v === "month") return "Month";
+    return "Quarter";
+  }
+
+  function computeScaleMultiplier(){
+    const s = PRICING.scale;
+
+    const users = Math.max(1, Number(state.intake.users || 1));
+    const companies = Math.max(1, Number(state.intake.companies || 1));
+    const countries = Math.max(1, Number(state.intake.countries || 1));
+    const tzCount = Math.max(1, state.intake.timezones.length);
+
+    // Users scaling: baseline 25; +10% per extra 25 users
+    const extraUsers = Math.max(0, users - s.usersBaseline);
+    const userSteps = Math.ceil(extraUsers / s.usersStep);
+    const usersMult = 1 + (userSteps * s.usersStepMult);
+
+    // Companies scaling
+    const extraCompanies = Math.max(0, companies - s.companiesBaseline);
+    const companiesMult = 1 + (extraCompanies * s.companyExtraMult);
+
+    // Countries scaling
+    const extraCountries = Math.max(0, countries - s.countriesBaseline);
+    const countriesMult = 1 + (extraCountries * s.countryExtraMult);
+
+    // Timezones scaling: more than 1 adds overhead
+    const extraTz = Math.max(0, tzCount - 1);
+    const tzMult = 1 + (extraTz * s.timezoneExtraMult);
+
+    // Window scaling
+    const windowMult = (state.intake.window === "followTheSun") ? s.followTheSunMult : 1;
+
+    // Multiply them
+    const total = usersMult * companiesMult * countriesMult * tzMult * windowMult;
+
+    return {
+      total,
+      parts: { usersMult, companiesMult, countriesMult, tzMult, windowMult, userSteps, extraUsers, tzCount }
+    };
+  }
+
+  function computeEstimate(){
+    const scale = computeScaleMultiplier().total;
+    let total = 0;
+
+    // L1
+    if(state.enabled.L1){
+      const base = PRICING.levelBase.L1;
+      const mult = PRICING.responseMult.L1[state.response.L1] || 1;
+      total += (base * mult) * scale;
+    }
+
+    // L2 (more sensitive to scale)
+    if(state.enabled.L2){
+      const base = PRICING.levelBase.L2;
+      const mult = PRICING.responseMult.L2[state.response.L2] || 1;
+      total += (base * mult) * scale;
+    }
+
+    // L3 (cadence)
+    if(state.enabled.L3){
+      const base = PRICING.levelBase.L3; // set >0 if you want a commitment/retainer
+      const mult = PRICING.cadenceMult.L3[state.cadence.L3] || 1;
+      total += (base * mult) * scale;
+    }
+
+    // L4 (governance scales too, but less harsh)
+    if(state.enabled.L4){
+      const base = PRICING.levelBase.L4;
+      const mult = PRICING.cadenceMult.L4[state.cadence.L4] || 1;
+      total += (base * mult) * (0.85 + (0.15 * scale)); // soften scaling impact for governance
+    }
+
+    // Round to nearest £50
+    return Math.round(total / 50) * 50;
+  }
+
+  function renderScaleHint(){
+    const m = computeScaleMultiplier();
+    const w = PRICING.serviceWindowText[state.intake.window] || PRICING.serviceWindowText.uk;
+
+    const users = Number(state.intake.users);
+    const tier =
+      users <= 25 ? "Small" :
+      users <= 100 ? "Mid" :
+      users <= 300 ? "Large" : "Enterprise";
+
+    const tz = state.intake.timezones.length;
+
+    elScaleHint.innerHTML = `
+      <b>Scale:</b> ${tier} • ${users} users • ${state.intake.companies} company(ies) • ${state.intake.countries} country(ies) • ${tz} timezone(s)<br>
+      <span class="note">Scale multiplier: ~${m.total.toFixed(2)}× (users ${m.parts.usersMult.toFixed(2)}× · companies ${m.parts.companiesMult.toFixed(2)}× · countries ${m.parts.countriesMult.toFixed(2)}× · timezones ${m.parts.tzMult.toFixed(2)}× · window ${m.parts.windowMult.toFixed(2)}×)</span><br>
+      <span class="note">Window: ${w}</span>
+    `;
+  }
+
+  function renderChips(total){
+    const host = document.getElementById("chips");
+    const w = PRICING.serviceWindowText[state.intake.window] || PRICING.serviceWindowText.uk;
+
+    const chips = [];
+    chips.push(`<span class="miniPill"><b>Estimate:</b> ${money(total)}/mo</span>`);
+    chips.push(`<span class="miniPill"><b>Window:</b> ${w}</span>`);
+    chips.push(`<span class="miniPill"><b>Users:</b> ${state.intake.users}</span>`);
+    chips.push(`<span class="miniPill"><b>Companies:</b> ${state.intake.companies}</span>`);
+    chips.push(`<span class="miniPill"><b>Countries:</b> ${state.intake.countries}</span>`);
+    chips.push(`<span class="miniPill"><b>Timezones:</b> ${state.intake.timezones.length}</span>`);
+
+    chips.push(`<span class="miniPill"><b>L1:</b> ${state.enabled.L1 ? labelResponseL1(state.response.L1) : "Off"}</span>`);
+    chips.push(`<span class="miniPill"><b>L2:</b> ${state.enabled.L2 ? labelResponseL2(state.response.L2) : "Off"}</span>`);
+    chips.push(`<span class="miniPill"><b>L3:</b> ${state.enabled.L3 ? labelCadence(state.cadence.L3) : "Off"}</span>`);
+    chips.push(`<span class="miniPill"><b>L4:</b> ${state.enabled.L4 ? labelCadence(state.cadence.L4) : "Off"}</span>`);
+
+    host.innerHTML = chips.join("");
+  }
+
+  function renderSlaTable(){
+    const host = document.getElementById("slaTable");
+
+    const rows = [
+      {
+        lvl: "L1",
+        selected: state.enabled.L1 ? "Yes" : "No",
+        target: state.enabled.L1 ? labelResponseL1(state.response.L1) : "—",
+        meaning: "Acknowledge + triage + next action for L1 tickets"
+      },
+      {
+        lvl: "L2",
+        selected: state.enabled.L2 ? "Yes" : "No",
+        target: state.enabled.L2 ? labelResponseL2(state.response.L2) : "—",
+        meaning: "Incident investigation beyond L1 (P1/P2 focus)"
+      },
+      {
+        lvl: "L3",
+        selected: state.enabled.L3 ? "Yes" : "No",
+        target: state.enabled.L3 ? labelCadence(state.cadence.L3) : "—",
+        meaning: "Planned change delivery cycle time target"
+      },
+      {
+        lvl: "L4",
+        selected: state.enabled.L4 ? "Yes" : "No",
+        target: state.enabled.L4 ? labelCadence(state.cadence.L4) : "—",
+        meaning: "Governance/backlog review rhythm"
+      }
+    ];
+
+    host.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>Selected</th>
+            <th>Target</th>
+            <th>What it means</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td><b>${r.lvl}</b></td>
+              <td>${r.selected}</td>
+              <td>${r.target}</td>
+              <td>${r.meaning}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function buildSummary(total){
+    const w = PRICING.serviceWindowText[state.intake.window] || PRICING.serviceWindowText.uk;
+
+    const lines = [
+      "Support Plan Enquiry (L1–L4)",
+      "",
+      "Environment scale:",
+      `- Licensed users: ${state.intake.users}`,
+      `- Companies: ${state.intake.companies}`,
+      `- Countries: ${state.intake.countries}`,
+      `- Active timezones: ${state.intake.timezones.join(", ")}`,
+      `- Support window: ${w}`,
+      "",
+      "Selected lanes:",
+      `- L1: ${state.enabled.L1 ? "Yes" : "No"}${state.enabled.L1 ? " (" + labelResponseL1(state.response.L1) + " response)" : ""}`,
+      `- L2: ${state.enabled.L2 ? "Yes" : "No"}${state.enabled.L2 ? " (" + labelResponseL2(state.response.L2) + " response for P1/P2)" : ""}`,
+      `- L3: ${state.enabled.L3 ? "Yes" : "No"}${state.enabled.L3 ? " (" + labelCadence(state.cadence.L3) + " cadence)" : ""}`,
+      `- L4: ${state.enabled.L4 ? "Yes" : "No"}${state.enabled.L4 ? " (" + labelCadence(state.cadence.L4) + " governance cadence)" : ""}`,
+      "",
+      `Indicative monthly estimate (ex VAT): ${money(total)}`,
+      "",
+      "Notes / boundaries:",
+      "- L1/L2: incidents + operational support. Development/change requests are L3.",
+      "- L3: requires a spec pack (goal, scope, acceptance criteria, test scenarios).",
+      "- If L2 is selected for large user bases, triage (L1) is strongly recommended to control volume and keep SLAs realistic."
+    ];
+
+    document.getElementById("summary").value = lines.join("\n");
+  }
+
+  function buildMailto(){
+    const email = PRICING.defaultEmail;
+    const subject = encodeURIComponent("Support Plan Enquiry (L1–L4)");
+    const body = encodeURIComponent(document.getElementById("summary").value);
+    return `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+  }
+
+  async function copyText(text){
+    try{
+      await navigator.clipboard.writeText(text);
+    }catch{
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+  }
+
+  function refresh(){
+    // Ensure enabled toggles -> disable pill groups
+    function setGroupDisabled(level, disabled){
+      document.querySelectorAll(`.pill[data-level="${level}"]`).forEach(p => {
+        p.style.opacity = disabled ? ".45" : "1";
+        p.style.pointerEvents = disabled ? "none" : "auto";
+      });
+    }
+
+    setGroupDisabled("L1", !state.enabled.L1);
+    setGroupDisabled("L2", !state.enabled.L2);
+    setGroupDisabled("L3", !state.enabled.L3);
+    setGroupDisabled("L4", !state.enabled.L4);
+
+    // Selected pills
+    setSelected("L1", "response", state.response.L1);
+    setSelected("L2", "response", state.response.L2);
+    setSelected("L3", "cadence", state.cadence.L3);
+    setSelected("L4", "cadence", state.cadence.L4);
+
+    renderScaleHint();
+
+    const total = computeEstimate();
+    document.getElementById("price").innerHTML = `${money(total)}<small>ex VAT • scaled to your inputs</small>`;
+    renderChips(total);
+    renderSlaTable();
+    buildSummary(total);
+
+    const mailto = buildMailto();
+    document.getElementById("openMailto").dataset.mailto = mailto;
+    document.getElementById("copyMailto").dataset.mailto = mailto;
+  }
+
+  // --- Intake handlers ---
+  function readIntake(){
+    state.intake.users = Math.max(1, Number(elUsers.value || 1));
+    state.intake.companies = Math.max(1, Number(elCompanies.value || 1));
+    state.intake.countries = Math.max(1, Number(elCountries.value || 1));
+    state.intake.window = elWindow.value || "uk";
+  }
+
+  [elUsers, elCompanies, elCountries, elWindow].forEach(el => {
+    el.addEventListener("input", () => { readIntake(); refresh(); });
+  });
+
+  // Timezone pills
+  function toggleTimezone(tz){
+    const idx = state.intake.timezones.indexOf(tz);
+    if(idx >= 0){
+      // Keep at least one timezone selected
+      if(state.intake.timezones.length === 1) return;
+      state.intake.timezones.splice(idx, 1);
+    }else{
+      state.intake.timezones.push(tz);
+    }
+    // Reflect UI
+    document.querySelectorAll(".tzPill").forEach(p => {
+      if(p.dataset.tz === tz){
+        p.dataset.selected = (idx < 0) ? "true" : "false";
+      }
+    });
+    refresh();
+  }
+
+  document.querySelectorAll(".tzPill").forEach(p => {
+    p.addEventListener("click", () => toggleTimezone(p.dataset.tz));
+    p.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        toggleTimezone(p.dataset.tz);
+      }
+    });
+  });
+
+  // --- Wire up lane toggles ---
+  document.getElementById("enableL1").addEventListener("input", (e) => { state.enabled.L1 = e.target.checked; refresh(); });
+  document.getElementById("enableL2").addEventListener("input", (e) => { state.enabled.L2 = e.target.checked; refresh(); });
+  document.getElementById("enableL3").addEventListener("input", (e) => { state.enabled.L3 = e.target.checked; refresh(); });
+  document.getElementById("enableL4").addEventListener("input", (e) => { state.enabled.L4 = e.target.checked; refresh(); });
+
+  // --- Pills (click + keyboard) ---
+  function onPillActivate(pill){
+    const level = pill.dataset.level;
+    const type = pill.dataset.type;
+    const value = pill.dataset.value;
+
+    if(level === "L1" && type === "response") state.response.L1 = value;
+    if(level === "L2" && type === "response") state.response.L2 = value;
+    if(level === "L3" && type === "cadence") state.cadence.L3 = value;
+    if(level === "L4" && type === "cadence") state.cadence.L4 = value;
+
+    refresh();
+  }
+
+  document.querySelectorAll(".pill").forEach(p => {
+    p.addEventListener("click", () => onPillActivate(p));
+    p.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        onPillActivate(p);
+      }
+    });
+  });
+
+  // --- Copy / mailto buttons ---
+  document.getElementById("copySummary").addEventListener("click", async () => {
+    await copyText(document.getElementById("summary").value);
+    const btn = document.getElementById("copySummary");
+    btn.textContent = "Copied";
+    setTimeout(()=>btn.textContent="Copy summary", 900);
+  });
+
+  document.getElementById("copyMailto").addEventListener("click", async () => {
+    await copyText(document.getElementById("copyMailto").dataset.mailto || "");
+    const btn = document.getElementById("copyMailto");
+    btn.textContent = "Copied";
+    setTimeout(()=>btn.textContent="Copy mailto link", 900);
+  });
+
+  document.getElementById("openMailto").addEventListener("click", () => {
+    window.location.href = document.getElementById("openMailto").dataset.mailto || "#";
+  });
+
+  // Init
+  readIntake();
+  refresh();
+</script>
+</body>
+</html>
+```
