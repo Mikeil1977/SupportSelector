@@ -1,0 +1,1158 @@
+```html
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Support Plan Builder — L1 to L4 + Retainer</title>
+
+  <style>
+    :root{
+      --bg:#0B1220;
+      --card:#111B2E;
+      --muted:#A7B6CF;
+      --text:#E6EEF9;
+      --border:#22304A;
+      --accent:#6AA6FF;
+
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --glassTop: rgba(255,255,255,.05);
+      --glassBot: rgba(255,255,255,.02);
+      --panelBg: rgba(0,0,0,.20);
+      --inputBg: rgba(0,0,0,.28);
+    }
+
+    html[data-theme="light"]{
+      --bg:#F6F8FC;
+      --card:#FFFFFF;
+      --muted:#475569;
+      --text:#0F172A;
+      --border:#E6EAF2;
+      --accent:#2563EB;
+
+      --shadow: 0 14px 40px rgba(15,23,42,.10);
+      --glassTop: rgba(15,23,42,.03);
+      --glassBot: rgba(15,23,42,.02);
+      --panelBg: rgba(15,23,42,.03);
+      --inputBg: rgba(15,23,42,.03);
+    }
+
+    *{ box-sizing:border-box }
+    :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 20% 0%, rgba(106,166,255,.20) 0%, transparent 58%),
+        radial-gradient(1000px 650px at 85% 15%, rgba(54,211,153,.12) 0%, transparent 60%),
+        var(--bg);
+      line-height:1.45;
+    }
+
+    .wrap{ max-width:1060px; margin:0 auto; padding:26px 18px 44px; }
+
+    header{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .titleBlock b{ display:block; font-size:14px; letter-spacing:.2px; }
+    .titleBlock span{ display:block; font-size:12px; color:var(--muted); margin-top:2px; }
+
+    button{
+      border:1px solid var(--border);
+      background: color-mix(in oklab, var(--accent) 16%, transparent);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:12px;
+      transition: border-color .15s ease, transform .05s ease, background .15s ease;
+    }
+    button.secondary{ background: var(--panelBg) }
+    button:hover{ border-color: color-mix(in oklab, var(--border) 60%, white) }
+    button:active{ transform: translateY(1px) }
+
+    .card{
+      background: linear-gradient(180deg, var(--glassTop), var(--glassBot));
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+
+    .rowCard{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: var(--panelBg);
+      padding:14px;
+      display:grid;
+      grid-template-columns: 56px 1fr 340px;
+      gap:14px;
+      align-items:center;
+      margin-top:12px;
+    }
+    @media (max-width:980px){
+      .rowCard{ grid-template-columns: 56px 1fr; }
+      .rightCol{ grid-column: 1 / -1; }
+    }
+
+    .lvl{
+      width:56px; height:56px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; letter-spacing:.3px;
+      flex-direction:column;
+      gap:2px;
+    }
+    .lvl span{ line-height:1; }
+    .lvl small{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      font-weight:600;
+      letter-spacing:.2px;
+      text-align:center;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:20px;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+    .sub{ margin:0; color:var(--muted); font-size:13px; }
+
+    .leftCol h2{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .leftCol p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .selectRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+
+    .toggle{
+      display:flex; align-items:center; gap:10px;
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(0,0,0,.10);
+    }
+    html[data-theme="light"] .toggle{ background: rgba(15,23,42,.02); }
+    .toggle input{ margin:0; }
+
+    .rightCol{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      justify-self:end;
+      width:100%;
+      max-width:340px;
+    }
+    @media (max-width:980px){
+      .rightCol{ justify-self:stretch; max-width:none; }
+    }
+
+    .rightCol label{
+      font-size:12px;
+      color:var(--muted);
+      display:block;
+      margin-bottom:6px;
+    }
+
+    .pillGroup{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.12);
+      color: var(--text);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition: background .15s ease, border-color .15s ease, transform .05s ease;
+      min-width: 86px;
+      text-align:center;
+    }
+    html[data-theme="light"] .pill{ background: rgba(15,23,42,.03); }
+
+    .pill:hover{ border-color: color-mix(in oklab, var(--border) 60%, white); }
+    .pill:active{ transform: translateY(1px) }
+
+    .pill[data-selected="true"]{
+      background: color-mix(in oklab, var(--accent) 18%, transparent);
+      border-color: color-mix(in oklab, var(--accent) 50%, var(--border));
+    }
+
+    .hint{ font-size:12px; color:var(--muted); }
+
+    .hr{ height:1px; background:var(--border); margin:16px 0; }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: var(--panelBg);
+      overflow:hidden;
+    }
+    th, td{
+      padding:10px;
+      border-bottom:1px solid var(--border);
+      font-size:12px;
+      vertical-align:top;
+    }
+    th{
+      text-align:left;
+      color: color-mix(in oklab, var(--text) 92%, transparent);
+      background: color-mix(in oklab, var(--panelBg) 40%, transparent);
+      font-weight:600;
+    }
+    tr:last-child td{ border-bottom:none }
+
+    .note{ font-size:12px; color:var(--muted) }
+
+    .summaryBox{
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:14px;
+      align-items:start;
+      margin-top:14px;
+    }
+    @media (max-width:980px){
+      .summaryBox{ grid-template-columns:1fr; }
+    }
+
+    textarea{
+      width:100%;
+      border:1px solid var(--border);
+      background: var(--inputBg);
+      color: var(--text);
+      border-radius:12px;
+      padding:10px;
+      outline:none;
+      min-height:200px;
+      resize:vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+    }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+
+    .bigPrice{
+      font-size:26px;
+      margin:0;
+      line-height:1;
+      letter-spacing:.2px;
+    }
+    .bigPrice small{
+      display:block;
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .pillRow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .miniPill{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--border);
+      background: var(--panelBg);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .miniPill b{ color:var(--text); font-weight:600; }
+
+    .mutedBox{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: var(--panelBg);
+      padding:12px;
+    }
+
+    /* Intake block */
+    .intakeGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    @media (max-width:800px){ .intakeGrid{ grid-template-columns:1fr; } }
+
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    input[type="number"], select{
+      width:100%;
+      border:1px solid var(--border);
+      background: var(--inputBg);
+      color: var(--text);
+      border-radius:12px;
+      padding:10px;
+      outline:none;
+    }
+
+    .tzBox{
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(0,0,0,.10);
+      padding:10px;
+    }
+    html[data-theme="light"] .tzBox{ background: rgba(15,23,42,.02); }
+
+    .tzPills{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+
+    .tzPill{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.12);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      cursor:pointer;
+      user-select:none;
+    }
+    html[data-theme="light"] .tzPill{ background: rgba(15,23,42,.03); }
+    .tzPill[data-selected="true"]{
+      color: var(--text);
+      background: color-mix(in oklab, var(--accent) 16%, transparent);
+      border-color: color-mix(in oklab, var(--accent) 50%, var(--border));
+    }
+
+    .riskLine{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .riskLine b{ color:var(--text); font-weight:600; }
+
+    /* Retainer row accent */
+    .rowCard.retainer{
+      border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+      background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 10%, transparent), var(--panelBg));
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div class="titleBlock">
+      <b>NAV / Business Central Support — SLA Builder</b>
+      <span>Start with environment scale. Then choose Retainer and/or L1–L4 lanes.</span>
+    </div>
+    <button id="themeToggle" class="secondary" type="button" aria-label="Toggle light/dark mode">Light mode</button>
+  </header>
+
+  <section class="card">
+    <h1>1) Tell us the scale of your environment</h1>
+    <p class="sub">
+      Inputs adjust the indicative estimate and help set realistic SLAs. Company count is weighted by how similar/different the companies are.
+    </p>
+
+    <div class="intakeGrid" aria-label="Environment intake">
+      <div class="field">
+        <label for="licensedUsers">Licensed users</label>
+        <input id="licensedUsers" type="number" min="1" step="1" value="25" />
+      </div>
+
+      <div class="field">
+        <label for="companies">Number of companies (BC companies / NAV companies)</label>
+        <input id="companies" type="number" min="1" step="1" value="1" />
+      </div>
+
+      <div class="field">
+        <label for="companySimilarity">How similar are the companies?</label>
+        <select id="companySimilarity">
+          <option value="identical" selected>Near-identical setup (shared template)</option>
+          <option value="some">Some differences (posting/dimensions/approvals vary)</option>
+          <option value="material">Material differences (process/regime/integrations differ)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="countries">Countries in scope (distinct regulatory / operational regions)</label>
+        <input id="countries" type="number" min="1" step="1" value="1" />
+      </div>
+
+      <div class="field">
+        <label for="supportWindow">Primary support window (baseline)</label>
+        <select id="supportWindow">
+          <option value="uk" selected>Mon–Fri 09:00–17:30 (UK)</option>
+          <option value="emea">Mon–Fri 08:00–18:00 (EMEA)</option>
+          <option value="followTheSun">Follow-the-sun (multiple timezones)</option>
+        </select>
+      </div>
+
+      <div class="field" style="grid-column: 1 / -1;">
+        <div class="tzBox">
+          <label style="margin:0;">Active timezones</label>
+          <div class="tzPills" id="tzPills" aria-label="Timezone selection">
+            <div class="tzPill" tabindex="0" data-tz="UK" data-selected="true">UK</div>
+            <div class="tzPill" tabindex="0" data-tz="Europe">Europe</div>
+            <div class="tzPill" tabindex="0" data-tz="MiddleEast">Middle East</div>
+            <div class="tzPill" tabindex="0" data-tz="India">India</div>
+            <div class="tzPill" tabindex="0" data-tz="APAC">APAC</div>
+            <div class="tzPill" tabindex="0" data-tz="US-East">US East</div>
+            <div class="tzPill" tabindex="0" data-tz="US-West">US West</div>
+          </div>
+          <div class="riskLine" id="scaleHint"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <h1>2) Retainer option (covers L2–L4)</h1>
+    <p class="sub">
+      A retainer is for customers who want predictable access to an engineer for incidents and change work.
+      Selecting a retainer applies to L2–L4. L1 remains optional.
+    </p>
+
+    <div class="rowCard retainer" data-level="RET">
+      <div class="lvl" aria-label="Retainer">
+        <span>R</span>
+        <small>All</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Retainer — Access & Priority (covers L2–L4)</h2>
+        <p>
+          Priority queue position and predictable availability for higher-level work. Best when you regularly need incident investigation,
+          development changes, or governance/roadmap support and want faster engagement than ad-hoc support.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableRetainer" />
+            <span><b>Select Retainer</b></span>
+          </label>
+          <span class="hint">If selected, L2–L4 lanes become “covered” by the retainer.</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>Retainer response target (for L2–L4 engagement)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="Retainer response target">
+            <div class="pill" role="radio" tabindex="0" data-level="RET" data-type="response" data-value="1h">1 hour</div>
+            <div class="pill" role="radio" tabindex="0" data-level="RET" data-type="response" data-value="sameDay" data-selected="true">Same day</div>
+            <div class="pill" role="radio" tabindex="0" data-level="RET" data-type="response" data-value="nextDay">Next day</div>
+          </div>
+        </div>
+        <div class="hint">Applies to: incident investigation, dev engagement, and governance actions under retainer.</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <h1>3) Choose your support lanes</h1>
+    <p class="sub">
+      If the retainer is selected, L2–L4 are treated as covered by the retainer (lane toggles stay visible for clarity).
+    </p>
+
+    <!-- L1 -->
+    <div class="rowCard" data-level="L1">
+      <div class="lvl" aria-label="Level 1">
+        <span>L1</span>
+        <small>Ops</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Level 1 — Service Desk & Triage</h2>
+        <p>
+          First line handling for “how-to”, user issues, posting errors with known workarounds, basic permissions and setup checks,
+          ticket hygiene, and escalation packs (repro steps, screenshots, sample data) for L2/L3.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableL1" checked />
+            <span><b>Select L1</b></span>
+          </label>
+          <span class="hint">Recommended for higher user counts to protect L2 from volume.</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>L1 response target (first acknowledgement)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="L1 response target">
+            <div class="pill" role="radio" tabindex="0" data-level="L1" data-type="response" data-value="1h">1 hour</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L1" data-type="response" data-value="sameDay" data-selected="true">Same day</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L1" data-type="response" data-value="nextDay">Next day</div>
+          </div>
+        </div>
+        <div class="hint">Includes: triage + next action. Excludes: new development/change requests.</div>
+      </div>
+    </div>
+
+    <!-- L2 -->
+    <div class="rowCard" data-level="L2">
+      <div class="lvl" aria-label="Level 2">
+        <span>L2</span>
+        <small>Inc</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Level 2 — Application Support (Functional/Technical)</h2>
+        <p>
+          Incident investigation beyond L1: deeper NAV/BC functional troubleshooting, data fixes, configuration changes,
+          liaison with key users, and vendor/ISV coordination where appropriate.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableL2" />
+            <span><b>Select L2</b></span>
+          </label>
+          <span class="hint">If Retainer is selected, L2 is covered by Retainer response target.</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>L2 response target (P1/P2 incidents)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="L2 response target">
+            <div class="pill" role="radio" tabindex="0" data-level="L2" data-type="response" data-value="2h">2 hours</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L2" data-type="response" data-value="4h" data-selected="true">4 hours</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L2" data-type="response" data-value="nextDay">Next day</div>
+          </div>
+        </div>
+        <div class="hint">When Retainer is selected, these targets are informational (L2 is “covered”).</div>
+      </div>
+    </div>
+
+    <!-- L3 -->
+    <div class="rowCard" data-level="L3">
+      <div class="lvl" aria-label="Level 3">
+        <span>L3</span>
+        <small>Dev</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Level 3 — Development & Changes</h2>
+        <p>
+          New features, enhancements, integrations, reports, and code-level fixes. Requires a minimum spec pack
+          (goal, scope, acceptance criteria, test scenarios). Work is scheduled; “start now” requests are Emergency Change.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableL3" />
+            <span><b>Select L3</b></span>
+          </label>
+          <span class="hint">If Retainer is selected, L3 engagement is covered (change work still billed hourly unless bundled).</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>L3 delivery cadence (for planned change)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="L3 cadence">
+            <div class="pill" role="radio" tabindex="0" data-level="L3" data-type="cadence" data-value="day">Day</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L3" data-type="cadence" data-value="week" data-selected="true">Week</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L3" data-type="cadence" data-value="month">Month</div>
+          </div>
+        </div>
+        <div class="hint">Cadence = typical cycle time target for planned work (not incident response).</div>
+      </div>
+    </div>
+
+    <!-- L4 -->
+    <div class="rowCard" data-level="L4">
+      <div class="lvl" aria-label="Level 4">
+        <span>L4</span>
+        <small>Gov</small>
+      </div>
+
+      <div class="leftCol">
+        <h2>Level 4 — Proactive Governance & Roadmap</h2>
+        <p>
+          Prevents “everything is urgent”: demand shaping, backlog triage, architectural guidance, quarterly planning,
+          release governance, vendor management, and making specs/test packs good enough that dev is not guesswork.
+        </p>
+
+        <div class="selectRow">
+          <label class="toggle">
+            <input type="checkbox" id="enableL4" />
+            <span><b>Select L4</b></span>
+          </label>
+          <span class="hint">If Retainer is selected, L4 is covered by Retainer response target.</span>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div>
+          <label>L4 review cadence (governance rhythm)</label>
+          <div class="pillGroup" role="radiogroup" aria-label="L4 cadence">
+            <div class="pill" role="radio" tabindex="0" data-level="L4" data-type="cadence" data-value="week" data-selected="true">Week</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L4" data-type="cadence" data-value="month">Month</div>
+            <div class="pill" role="radio" tabindex="0" data-level="L4" data-type="cadence" data-value="quarter">Quarter</div>
+          </div>
+        </div>
+        <div class="hint">Cadence sets rhythm; engagement/priority is governed by Retainer response target if selected.</div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="summaryBox">
+      <div class="mutedBox">
+        <h2 style="margin:0; font-size:14px; letter-spacing:.2px;">SLA snapshot</h2>
+        <p class="note" style="margin:8px 0 0;">
+          Retainer (if selected) sets the engagement response target for L2–L4. L1 remains separate.
+        </p>
+        <div id="slaTable" style="margin-top:10px;"></div>
+
+        <p class="note" style="margin-top:10px;">
+          Boundary conditions: L1/L2 do not include new development; L3 requires a spec pack; “start now” development is Emergency Change.
+        </p>
+      </div>
+
+      <div class="mutedBox">
+        <h2 style="margin:0; font-size:14px; letter-spacing:.2px;">Indicative estimate</h2>
+        <p class="bigPrice" id="price">£—<small>ex VAT • scaled to your inputs</small></p>
+        <div class="pillRow" id="chips"></div>
+
+        <div class="hr"></div>
+
+        <h2 style="margin:0; font-size:14px; letter-spacing:.2px;">Configuration summary</h2>
+        <textarea id="summary" readonly></textarea>
+
+        <div class="actions">
+          <button id="copySummary" type="button">Copy summary</button>
+          <button id="copyMailto" class="secondary" type="button">Copy mailto link</button>
+          <button id="openMailto" class="secondary" type="button">Open email client</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<script>
+  // --- Theme toggle ---
+  (function themeInit(){
+    const KEY = "ui-theme";
+    const btn = document.getElementById("themeToggle");
+    function setTheme(theme){
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem(KEY, theme);
+      btn.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+    }
+    const saved = localStorage.getItem(KEY);
+    setTheme(saved === "light" ? "light" : "dark");
+    btn.addEventListener("click", () => {
+      const current = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+      setTheme(current === "dark" ? "light" : "dark");
+    });
+  })();
+
+  // =========================
+  // PRICING / SCALING (edit)
+  // =========================
+  const PRICING = {
+    serviceWindowText: {
+      uk: "Mon–Fri 09:00–17:30 (UK)",
+      emea: "Mon–Fri 08:00–18:00 (EMEA)",
+      followTheSun: "Follow-the-sun (multiple timezones)"
+    },
+
+    base: {
+      RET: 900,
+      L1: 350,
+      L2: 650,
+      L3: 0,
+      L4: 450
+    },
+
+    responseMult: {
+      L1: { "1h": 2.0, sameDay: 1.4, nextDay: 1.0 },
+      L2: { "2h": 1.6, "4h": 1.2, nextDay: 1.0 },
+      RET: { "1h": 2.2, sameDay: 1.5, nextDay: 1.0 }
+    },
+
+    cadenceMult: {
+      L3: { day: 1.8, week: 1.2, month: 1.0 },
+      L4: { week: 1.4, month: 1.1, quarter: 1.0 }
+    },
+
+    scale: {
+      usersBaseline: 25,
+      usersStep: 25,
+      usersStepMult: 0.10,       // +10% per +25 users over baseline
+
+      // Companies are now weighted by similarity:
+      // identical: small overhead per extra company
+      // some: moderate overhead per extra company
+      // material: higher overhead per extra company
+      companyExtraMultBySimilarity: {
+        identical: 0.02, // +2% per extra company
+        some: 0.06,      // +6% per extra company
+        material: 0.12   // +12% per extra company
+      },
+
+      countriesBaseline: 1,
+      countryExtraMult: 0.10,    // +10% per additional country
+
+      timezoneExtraMult: 0.07,   // +7% per additional timezone selected (beyond 1)
+      followTheSunMult: 1.35
+    },
+
+    defaultEmail: "support@yourdomain.tld"
+  };
+
+  // =========================
+  // STATE
+  // =========================
+  const state = {
+    intake: {
+      users: 25,
+      companies: 1,
+      companySimilarity: "identical",
+      countries: 1,
+      window: "uk",
+      timezones: ["UK"]
+    },
+    retainer: { enabled: false, response: "sameDay" },
+    enabled: { L1: true, L2: false, L3: false, L4: false },
+    response: { L1: "sameDay", L2: "4h" },
+    cadence: { L3: "week", L4: "week" }
+  };
+
+  // --- DOM ---
+  const elUsers = document.getElementById("licensedUsers");
+  const elCompanies = document.getElementById("companies");
+  const elCompanySimilarity = document.getElementById("companySimilarity");
+  const elCountries = document.getElementById("countries");
+  const elWindow = document.getElementById("supportWindow");
+  const elScaleHint = document.getElementById("scaleHint");
+
+  const elEnableRetainer = document.getElementById("enableRetainer");
+  const elEnableL1 = document.getElementById("enableL1");
+  const elEnableL2 = document.getElementById("enableL2");
+  const elEnableL3 = document.getElementById("enableL3");
+  const elEnableL4 = document.getElementById("enableL4");
+
+  // --- Helpers ---
+  function money(n){
+    const x = Number(n || 0);
+    return "£" + x.toLocaleString("en-GB", { maximumFractionDigits: 0 });
+  }
+
+  function setSelected(level, type, value){
+    const selector = `.pill[data-level="${level}"][data-type="${type}"]`;
+    document.querySelectorAll(selector).forEach(p => p.dataset.selected = "false");
+    const el = document.querySelector(`.pill[data-level="${level}"][data-type="${type}"][data-value="${value}"]`);
+    if(el) el.dataset.selected = "true";
+  }
+
+  function labelRespCommon(v){
+    if(v === "1h") return "1 hour";
+    if(v === "sameDay") return "Same day";
+    return "Next business day";
+  }
+  function labelResponseL2(v){
+    if(v === "2h") return "2 hours";
+    if(v === "4h") return "4 hours";
+    return "Next day";
+  }
+  function labelCadence(v){
+    if(v === "day") return "Day";
+    if(v === "week") return "Week";
+    if(v === "month") return "Month";
+    return "Quarter";
+  }
+  function labelCompanySimilarity(v){
+    if(v === "identical") return "Near-identical setup";
+    if(v === "some") return "Some differences";
+    return "Material differences";
+  }
+
+  function computeScaleMultiplier(){
+    const s = PRICING.scale;
+
+    const users = Math.max(1, Number(state.intake.users || 1));
+    const companies = Math.max(1, Number(state.intake.companies || 1));
+    const countries = Math.max(1, Number(state.intake.countries || 1));
+    const tzCount = Math.max(1, state.intake.timezones.length);
+
+    // Users scaling
+    const extraUsers = Math.max(0, users - s.usersBaseline);
+    const userSteps = Math.ceil(extraUsers / s.usersStep);
+    const usersMult = 1 + (userSteps * s.usersStepMult);
+
+    // Companies scaling (weighted by similarity)
+    const extraCompanies = Math.max(0, companies - 1);
+    const companyMultRate = s.companyExtraMultBySimilarity[state.intake.companySimilarity] ?? s.companyExtraMultBySimilarity.some;
+    const companiesMult = 1 + (extraCompanies * companyMultRate);
+
+    // Countries scaling
+    const extraCountries = Math.max(0, countries - s.countriesBaseline);
+    const countriesMult = 1 + (extraCountries * s.countryExtraMult);
+
+    // Timezones scaling
+    const extraTz = Math.max(0, tzCount - 1);
+    const tzMult = 1 + (extraTz * s.timezoneExtraMult);
+
+    // Window scaling
+    const windowMult = (state.intake.window === "followTheSun") ? s.followTheSunMult : 1;
+
+    const total = usersMult * companiesMult * countriesMult * tzMult * windowMult;
+
+    return {
+      total,
+      parts: {
+        usersMult, companiesMult, countriesMult, tzMult, windowMult,
+        userSteps, extraCompanies, companyMultRate, tzCount
+      }
+    };
+  }
+
+  function renderScaleHint(){
+    const m = computeScaleMultiplier();
+    const w = PRICING.serviceWindowText[state.intake.window] || PRICING.serviceWindowText.uk;
+
+    const users = Number(state.intake.users);
+    const tier =
+      users <= 25 ? "Small" :
+      users <= 100 ? "Mid" :
+      users <= 300 ? "Large" : "Enterprise";
+
+    const tz = state.intake.timezones.length;
+
+    elScaleHint.innerHTML = `
+      <b>Scale:</b> ${tier} • ${users} users • ${state.intake.companies} company(ies) • ${state.intake.countries} country(ies) • ${tz} timezone(s)<br>
+      <span class="note">Companies: ${labelCompanySimilarity(state.intake.companySimilarity)} ( +${Math.round(m.parts.companyMultRate*100)}% per extra company )</span><br>
+      <span class="note">Scale multiplier: ~${m.total.toFixed(2)}×</span><br>
+      <span class="note">Window: ${w}</span>
+    `;
+  }
+
+  function computeEstimate(){
+    const scale = computeScaleMultiplier().total;
+    let total = 0;
+
+    // Retainer (covers L2-L4 engagement)
+    if(state.retainer.enabled){
+      const base = PRICING.base.RET;
+      const mult = PRICING.responseMult.RET[state.retainer.response] || 1;
+      total += (base * mult) * scale;
+    }
+
+    // L1 separate
+    if(state.enabled.L1){
+      const base = PRICING.base.L1;
+      const mult = PRICING.responseMult.L1[state.response.L1] || 1;
+      total += (base * mult) * scale;
+    }
+
+    // A-la-carte lanes only if no retainer
+    if(!state.retainer.enabled){
+      if(state.enabled.L2){
+        const base = PRICING.base.L2;
+        const mult = PRICING.responseMult.L2[state.response.L2] || 1;
+        total += (base * mult) * scale;
+      }
+
+      if(state.enabled.L4){
+        const base = PRICING.base.L4;
+        const mult = PRICING.cadenceMult.L4[state.cadence.L4] || 1;
+        total += (base * mult) * (0.85 + (0.15 * scale)); // soften scaling for governance
+      }
+
+      if(state.enabled.L3){
+        const base = PRICING.base.L3; // 0 by design (assumed billed hourly)
+        const mult = PRICING.cadenceMult.L3[state.cadence.L3] || 1;
+        total += (base * mult) * scale;
+      }
+    }
+
+    return Math.round(total / 50) * 50;
+  }
+
+  function renderChips(total){
+    const host = document.getElementById("chips");
+    const w = PRICING.serviceWindowText[state.intake.window] || PRICING.serviceWindowText.uk;
+
+    const chips = [];
+    chips.push(`<span class="miniPill"><b>Estimate:</b> ${money(total)}/mo</span>`);
+    chips.push(`<span class="miniPill"><b>Window:</b> ${w}</span>`);
+    chips.push(`<span class="miniPill"><b>Users:</b> ${state.intake.users}</span>`);
+    chips.push(`<span class="miniPill"><b>Companies:</b> ${state.intake.companies} (${labelCompanySimilarity(state.intake.companySimilarity)})</span>`);
+    chips.push(`<span class="miniPill"><b>Countries:</b> ${state.intake.countries}</span>`);
+    chips.push(`<span class="miniPill"><b>Timezones:</b> ${state.intake.timezones.length}</span>`);
+
+    chips.push(`<span class="miniPill"><b>Retainer:</b> ${state.retainer.enabled ? labelRespCommon(state.retainer.response) : "Off"}</span>`);
+    chips.push(`<span class="miniPill"><b>L1:</b> ${state.enabled.L1 ? labelRespCommon(state.response.L1) : "Off"}</span>`);
+    chips.push(`<span class="miniPill"><b>L2:</b> ${state.retainer.enabled ? "Covered" : (state.enabled.L2 ? labelResponseL2(state.response.L2) : "Off")}</span>`);
+    chips.push(`<span class="miniPill"><b>L3:</b> ${state.retainer.enabled ? "Covered" : (state.enabled.L3 ? labelCadence(state.cadence.L3) : "Off")}</span>`);
+    chips.push(`<span class="miniPill"><b>L4:</b> ${state.retainer.enabled ? "Covered" : (state.enabled.L4 ? labelCadence(state.cadence.L4) : "Off")}</span>`);
+
+    host.innerHTML = chips.join("");
+  }
+
+  function renderSlaTable(){
+    const host = document.getElementById("slaTable");
+    const retTxt = state.retainer.enabled ? labelRespCommon(state.retainer.response) : "—";
+
+    const rows = [
+      { lvl:"Retainer", selected: state.retainer.enabled ? "Yes" : "No", target: state.retainer.enabled ? retTxt : "—", meaning:"Engagement response target for L2–L4 under retainer" },
+      { lvl:"L1", selected: state.enabled.L1 ? "Yes" : "No", target: state.enabled.L1 ? labelRespCommon(state.response.L1) : "—", meaning:"Acknowledge + triage + next action for L1 tickets" },
+      { lvl:"L2", selected: state.retainer.enabled ? "Covered" : (state.enabled.L2 ? "Yes" : "No"), target: state.retainer.enabled ? retTxt : (state.enabled.L2 ? labelResponseL2(state.response.L2) : "—"), meaning:"Incident investigation beyond L1" },
+      { lvl:"L3", selected: state.retainer.enabled ? "Covered" : (state.enabled.L3 ? "Yes" : "No"), target: state.retainer.enabled ? retTxt : (state.enabled.L3 ? labelCadence(state.cadence.L3) : "—"), meaning:"Development engagement (cadence for planned work)" },
+      { lvl:"L4", selected: state.retainer.enabled ? "Covered" : (state.enabled.L4 ? "Yes" : "No"), target: state.retainer.enabled ? retTxt : (state.enabled.L4 ? labelCadence(state.cadence.L4) : "—"), meaning:"Governance/backlog review rhythm" }
+    ];
+
+    host.innerHTML = `
+      <table>
+        <thead><tr><th>Item</th><th>Selected</th><th>Target</th><th>What it means</th></tr></thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td><b>${r.lvl}</b></td>
+              <td>${r.selected}</td>
+              <td>${r.target}</td>
+              <td>${r.meaning}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function buildSummary(total){
+    const w = PRICING.serviceWindowText[state.intake.window] || PRICING.serviceWindowText.uk;
+
+    const lines = [
+      "Support Plan Enquiry (Retainer + L1–L4)",
+      "",
+      "Environment scale:",
+      `- Licensed users: ${state.intake.users}`,
+      `- Companies: ${state.intake.companies} (${labelCompanySimilarity(state.intake.companySimilarity)})`,
+      `- Countries: ${state.intake.countries}`,
+      `- Active timezones: ${state.intake.timezones.join(", ")}`,
+      `- Support window: ${w}`,
+      "",
+      "Selections:",
+      `- Retainer (covers L2–L4): ${state.retainer.enabled ? "Yes (" + labelRespCommon(state.retainer.response) + " response)" : "No"}`,
+      `- L1: ${state.enabled.L1 ? "Yes (" + labelRespCommon(state.response.L1) + " response)" : "No"}`,
+      state.retainer.enabled
+        ? "- L2–L4: Covered by retainer (incidents + dev engagement + governance)"
+        : `- L2: ${state.enabled.L2 ? "Yes (" + labelResponseL2(state.response.L2) + " response)" : "No"}`,
+      state.retainer.enabled ? null : `- L3: ${state.enabled.L3 ? "Yes (" + labelCadence(state.cadence.L3) + " cadence)" : "No"}`,
+      state.retainer.enabled ? null : `- L4: ${state.enabled.L4 ? "Yes (" + labelCadence(state.cadence.L4) + " cadence)" : "No"}`,
+      "",
+      `Indicative monthly estimate (ex VAT): ${money(total)}`,
+      "",
+      "Notes / boundaries:",
+      "- Company count is weighted by similarity: near-identical setups add less overhead than materially different companies.",
+      "- Retainer covers engagement priority and response target for L2–L4. Change work is still billed by time unless explicitly bundled.",
+      "- L1 is recommended for higher user counts to protect L2 from volume and keep SLAs realistic.",
+      "- L3 requires a spec pack (goal, scope, acceptance criteria, test scenarios). Emergency change is separately priced."
+    ].filter(Boolean);
+
+    document.getElementById("summary").value = lines.join("\n");
+  }
+
+  function buildMailto(){
+    const email = PRICING.defaultEmail;
+    const subject = encodeURIComponent("Support Plan Enquiry (Retainer + L1–L4)");
+    const body = encodeURIComponent(document.getElementById("summary").value);
+    return `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+  }
+
+  async function copyText(text){
+    try{
+      await navigator.clipboard.writeText(text);
+    }catch{
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+  }
+
+  function readIntake(){
+    state.intake.users = Math.max(1, Number(elUsers.value || 1));
+    state.intake.companies = Math.max(1, Number(elCompanies.value || 1));
+    state.intake.companySimilarity = elCompanySimilarity.value || "identical";
+    state.intake.countries = Math.max(1, Number(elCountries.value || 1));
+    state.intake.window = elWindow.value || "uk";
+  }
+
+  function refresh(){
+    // Retainer covers L2-L4: disable their checkboxes and treat as covered
+    const covered = state.retainer.enabled;
+    elEnableL2.disabled = covered;
+    elEnableL3.disabled = covered;
+    elEnableL4.disabled = covered;
+
+    if(covered){
+      state.enabled.L2 = true;
+      state.enabled.L3 = true;
+      state.enabled.L4 = true;
+    }
+
+    function setGroupDisabled(level, disabled){
+      document.querySelectorAll(`.pill[data-level="${level}"]`).forEach(p => {
+        p.style.opacity = disabled ? ".45" : "1";
+        p.style.pointerEvents = disabled ? "none" : "auto";
+      });
+    }
+
+    setGroupDisabled("RET", !state.retainer.enabled);
+    setGroupDisabled("L1", !state.enabled.L1);
+    setGroupDisabled("L2", covered || !state.enabled.L2);
+
+    // Keep L3/L4 cadence selectable even when covered (planning value)
+    setGroupDisabled("L3", !state.enabled.L3);
+    setGroupDisabled("L4", !state.enabled.L4);
+
+    setSelected("RET", "response", state.retainer.response);
+    setSelected("L1", "response", state.response.L1);
+    setSelected("L2", "response", state.response.L2);
+    setSelected("L3", "cadence", state.cadence.L3);
+    setSelected("L4", "cadence", state.cadence.L4);
+
+    renderScaleHint();
+
+    const total = computeEstimate();
+    document.getElementById("price").innerHTML = `${money(total)}<small>ex VAT • scaled to your inputs</small>`;
+    renderChips(total);
+    renderSlaTable();
+    buildSummary(total);
+
+    const mailto = buildMailto();
+    document.getElementById("openMailto").dataset.mailto = mailto;
+    document.getElementById("copyMailto").dataset.mailto = mailto;
+  }
+
+  // Intake handlers
+  [elUsers, elCompanies, elCompanySimilarity, elCountries, elWindow].forEach(el => {
+    el.addEventListener("input", () => { readIntake(); refresh(); });
+    el.addEventListener("change", () => { readIntake(); refresh(); });
+  });
+
+  // Timezone pills
+  function toggleTimezone(tz){
+    const idx = state.intake.timezones.indexOf(tz);
+    if(idx >= 0){
+      if(state.intake.timezones.length === 1) return;
+      state.intake.timezones.splice(idx, 1);
+    }else{
+      state.intake.timezones.push(tz);
+    }
+
+    document.querySelectorAll(".tzPill").forEach(p => {
+      if(p.dataset.tz === tz){
+        p.dataset.selected = (idx < 0) ? "true" : "false";
+      }
+    });
+
+    refresh();
+  }
+
+  document.querySelectorAll(".tzPill").forEach(p => {
+    p.addEventListener("click", () => toggleTimezone(p.dataset.tz));
+    p.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        toggleTimezone(p.dataset.tz);
+      }
+    });
+  });
+
+  // Toggles
+  elEnableRetainer.addEventListener("input", (e) => { state.retainer.enabled = e.target.checked; refresh(); });
+  elEnableL1.addEventListener("input", (e) => { state.enabled.L1 = e.target.checked; refresh(); });
+  elEnableL2.addEventListener("input", (e) => { state.enabled.L2 = e.target.checked; refresh(); });
+  elEnableL3.addEventListener("input", (e) => { state.enabled.L3 = e.target.checked; refresh(); });
+  elEnableL4.addEventListener("input", (e) => { state.enabled.L4 = e.target.checked; refresh(); });
+
+  // Pills
+  function onPillActivate(pill){
+    const level = pill.dataset.level;
+    const type = pill.dataset.type;
+    const value = pill.dataset.value;
+
+    if(level === "RET" && type === "response") state.retainer.response = value;
+
+    if(level === "L1" && type === "response") state.response.L1 = value;
+    if(level === "L2" && type === "response") state.response.L2 = value;
+    if(level === "L3" && type === "cadence") state.cadence.L3 = value;
+    if(level === "L4" && type === "cadence") state.cadence.L4 = value;
+
+    refresh();
+  }
+
+  document.querySelectorAll(".pill").forEach(p => {
+    p.addEventListener("click", () => onPillActivate(p));
+    p.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        onPillActivate(p);
+      }
+    });
+  });
+
+  // Copy / mailto buttons
+  document.getElementById("copySummary").addEventListener("click", async () => {
+    await copyText(document.getElementById("summary").value);
+    const btn = document.getElementById("copySummary");
+    btn.textContent = "Copied";
+    setTimeout(()=>btn.textContent="Copy summary", 900);
+  });
+
+  document.getElementById("copyMailto").addEventListener("click", async () => {
+    await copyText(document.getElementById("copyMailto").dataset.mailto || "");
+    const btn = document.getElementById("copyMailto");
+    btn.textContent = "Copied";
+    setTimeout(()=>btn.textContent="Copy mailto link", 900);
+  });
+
+  document.getElementById("openMailto").addEventListener("click", () => {
+    window.location.href = document.getElementById("openMailto").dataset.mailto || "#";
+  });
+
+  // Init
+  readIntake();
+  refresh();
+</script>
+</body>
+</html>
+```
