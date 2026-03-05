@@ -1,0 +1,1735 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Requirements Calculator</title>
+  <style>
+    @font-face{
+      font-family:"Dekar";
+      src:local("Dekar"), local("Dekar Regular"), local("DEKAR");
+      font-weight:400;
+      font-style:normal;
+      font-display:swap;
+    }
+    :root{
+      --bg:#f3f6f8;
+      --card:#ffffff;
+      --line:#d4dee7;
+      --text:#10212f;
+      --muted:#5b6d7e;
+      --brand:#0a7fb3;
+      --brand-soft:#e9f6fc;
+      --grad1:#e2f7ff;
+      --grad2:#ecf2ff;
+      --surface-1:#ffffff;
+      --surface-2:#f5f9fc;
+      --surface-3:#fbfdff;
+      --input-bg:#ffffff;
+      --warn:#a84b00;
+      --radius:14px;
+      --shadow:0 8px 24px rgba(0,0,0,.08);
+      --font-body:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+      --font-head:"Dekar", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0b1218;
+        --card:#111c25;
+        --line:#273646;
+        --text:#e6eff7;
+        --muted:#9cb0c2;
+        --brand:#43b0e4;
+        --brand-soft:#173043;
+        --grad1:#123047;
+        --grad2:#1b2a44;
+        --surface-1:#142330;
+        --surface-2:#172735;
+        --surface-3:#152431;
+        --input-bg:#0f1b25;
+        --warn:#f0ab73;
+        --shadow:0 10px 28px rgba(0,0,0,.35);
+      }
+    }
+    :root[data-theme="dark"]{
+      --bg:#0b1218;
+      --card:#111c25;
+      --line:#273646;
+      --text:#e6eff7;
+      --muted:#9cb0c2;
+      --brand:#43b0e4;
+      --brand-soft:#173043;
+      --grad1:#123047;
+      --grad2:#1b2a44;
+      --surface-1:#142330;
+      --surface-2:#172735;
+      --surface-3:#152431;
+      --input-bg:#0f1b25;
+      --warn:#f0ab73;
+      --shadow:0 10px 28px rgba(0,0,0,.35);
+    }
+    :root[data-theme="light"]{
+      --bg:#f3f6f8;
+      --card:#ffffff;
+      --line:#d4dee7;
+      --text:#10212f;
+      --muted:#5b6d7e;
+      --brand:#0a7fb3;
+      --brand-soft:#e9f6fc;
+      --grad1:#e2f7ff;
+      --grad2:#ecf2ff;
+      --surface-1:#ffffff;
+      --surface-2:#f5f9fc;
+      --surface-3:#fbfdff;
+      --input-bg:#ffffff;
+      --warn:#a84b00;
+      --shadow:0 8px 24px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font-body);
+      background:
+        radial-gradient(900px 650px at 95% -15%, var(--grad1) 0%, transparent 60%),
+        radial-gradient(650px 500px at -10% -20%, var(--grad2) 0%, transparent 65%),
+        var(--bg);
+      color:var(--text);
+    }
+    h1,
+    .hint,
+    .collapse-toggle,
+    th,
+    .service-top b,
+    .scope-title,
+    .section-label{
+      font-family:var(--font-head);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:22px 16px 48px;}
+    h1{margin:0 0 8px; font-size:34px;}
+    .sub{margin:0; color:var(--muted); font-size:14px;}
+    .top-row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .theme-control{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .theme-control select{
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:var(--input-bg);
+      color:var(--text);
+      padding:5px 8px;
+      font:inherit;
+    }
+    .card{
+      margin-top:14px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+    }
+    .hint{margin:0 0 10px; color:var(--muted); font-size:13px;}
+    .card-toggle-head .hint,
+    .customer-card-head .hint,
+    .card > .hint{
+      font-size:16px;
+      font-weight:600;
+      color:var(--text);
+    }
+    .collapse-toggle{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--surface-1);
+      color:var(--text);
+      padding:8px 10px;
+      cursor:pointer;
+      margin-bottom:8px;
+      font-size:16px;
+      font-weight:600;
+    }
+    .collapse-panel{
+      overflow:hidden;
+      max-height:0;
+      transition:max-height .22s ease;
+    }
+    .subsection-divider{
+      border-top:1px solid var(--line);
+      margin:12px 0;
+    }
+    .grid{
+      display:block;
+    }
+    .svc-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:760px){
+      .svc-grid{grid-template-columns:1fr}
+    }
+    .service{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      background:var(--surface-1);
+    }
+    .service-top{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .service-top input{width:18px; height:18px; margin:0}
+    .chips{display:flex; flex-wrap:wrap; gap:8px;}
+    .service .chips{display:none;}
+    .service.active .chips{display:flex;}
+    .service .service-metric{display:none;}
+    .service.active .service-metric{display:block;}
+    .chips input{display:none}
+    .chips label{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      color:var(--muted);
+      background:var(--surface-1);
+      cursor:pointer;
+    }
+    .chips input:checked + label{
+      border-color:var(--brand);
+      color:var(--text);
+      background:var(--brand-soft);
+    }
+    .service.disabled{opacity:.6}
+    .service-metric{
+      margin-top:10px;
+      padding-top:8px;
+      border-top:1px dashed var(--line);
+    }
+    .service-metric label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .service-metric .num{width:110px;}
+    .dev-scope{
+      margin-top:10px;
+      padding-top:8px;
+      border-top:1px dashed var(--line);
+      display:none;
+    }
+    .service.active .dev-scope{display:block;}
+    .dev-scope .scope-title{
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      font-weight:600;
+    }
+    .scope-list{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:4px;
+    }
+    .scope-item{
+      display:flex;
+      align-items:flex-start;
+      gap:6px;
+      font-size:12px;
+      color:var(--text);
+    }
+    .scope-item input{
+      margin-top:1px;
+    }
+    .scope-hours{
+      color:var(--muted);
+      font-size:11px;
+    }
+    .scope-total{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .strat-scope{
+      margin-top:10px;
+      padding-top:8px;
+      border-top:1px dashed var(--line);
+      display:none;
+    }
+    .service.active .strat-scope{display:block;}
+    .strat-scope .scope-title{
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      font-weight:600;
+    }
+    .strat-scope .scope-list{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:4px;
+    }
+    .strat-scope .scope-item{
+      display:flex;
+      align-items:flex-start;
+      gap:6px;
+      font-size:12px;
+      color:var(--text);
+    }
+    .strat-scope .scope-item input{
+      margin-top:1px;
+    }
+    .qual-block{
+      margin-top:12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface-3);
+      padding:10px;
+    }
+    .qual-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:8px;
+      margin-top:8px;
+    }
+    @media (max-width:640px){
+      .qual-grid{grid-template-columns:1fr}
+    }
+    .qual-item label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .qual-item input,
+    .qual-item textarea{
+      width:100%;
+      box-sizing:border-box;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:var(--input-bg);
+      color:var(--text);
+      padding:6px 8px;
+      font:inherit;
+      font-size:12px;
+    }
+    .qual-item select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:5px 6px;
+      font:inherit;
+      font-size:12px;
+      background:var(--input-bg);
+      color:var(--text);
+    }
+    .qual-item textarea{
+      min-height:84px;
+      resize:vertical;
+    }
+    .qual-item.full{
+      grid-column:1 / -1;
+    }
+    .tz-seg{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:4px;
+    }
+    .tz-seg input{display:none;}
+    .tz-seg label{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      color:var(--muted);
+      background:var(--surface-1);
+      cursor:pointer;
+      user-select:none;
+    }
+    .tz-seg input:checked + label{
+      border-color:var(--brand);
+      color:var(--text);
+      background:var(--brand-soft);
+    }
+    .qual-summary{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .customer-card-head,
+    .card-toggle-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .customer-card-head .hint,
+    .card-toggle-head .hint{
+      margin:0;
+    }
+    .card-compact-preview{
+      margin-top:8px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--surface-3);
+      padding:8px 10px;
+    }
+    .qual-badge{
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:2px 8px;
+      background:var(--surface-1);
+      color:var(--text);
+      font-weight:600;
+      display:inline-block;
+    }
+    .qual-warn{
+      color:var(--warn);
+      font-size:11px;
+      margin-top:4px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+      font-size:12px;
+      background:var(--surface-1);
+    }
+    th, td{
+      border-bottom:1px solid var(--line);
+      padding:8px;
+      text-align:left;
+      vertical-align:top;
+    }
+    tr:last-child td{border-bottom:none}
+    tr.total-row td{
+      font-weight:600;
+      background:var(--surface-2);
+    }
+    th{
+      background:var(--surface-2);
+      color:var(--muted);
+      font-weight:600;
+      font-size:13px;
+    }
+    .num{
+      width:88px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:5px 6px;
+      font:inherit;
+      font-size:12px;
+      background:var(--input-bg);
+      color:var(--text);
+    }
+    .kpi{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .breakdown-kpi{
+      margin-bottom:12px;
+    }
+    .box{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface-3);
+      padding:10px;
+    }
+    .box .n{font-size:22px; font-weight:700}
+    .box .t{font-size:12px; color:var(--muted)}
+    .small{font-size:12px; color:var(--muted)}
+    .rate-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin-top:8px;
+    }
+    @media (max-width:640px){
+      .rate-grid{grid-template-columns:1fr}
+    }
+    .rate-item label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .section-label{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:8px;
+    }
+    .hidden-col{display:none;}
+    pre{
+      margin:0;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface-3);
+      padding:10px;
+      white-space:pre-wrap;
+      font-size:12px;
+      line-height:1.35;
+    }
+    .actions{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+    .schedule-preview{
+      font-size:11px;
+      color:var(--muted);
+      max-width:340px;
+      white-space:normal;
+      word-break:break-word;
+    }
+    .warn{
+      color:var(--warn);
+      font-size:11px;
+      margin-top:4px;
+    }
+    button{
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--surface-1);
+      color:var(--text);
+      padding:8px 11px;
+      font:inherit;
+      cursor:pointer;
+    }
+    button.primary{
+      border-color:var(--brand);
+      background:var(--brand-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-row">
+      <div>
+        <h1>Requirements Calculator</h1>
+        <p class="sub">Estimate calendar overhead required to hold response commitments for selected services.</p>
+      </div>
+      <label class="theme-control" for="themeMode">
+        Theme
+        <select id="themeMode">
+          <option value="system">System (default)</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+    </div>
+
+    <section class="card" id="customerInfoCard">
+      <div class="customer-card-head">
+        <p class="hint">Customer information &amp; business setup</p>
+        <button type="button" class="primary" id="customerInfoSubmit" aria-expanded="true">Done</button>
+      </div>
+      <div id="customerInfoPanel">
+      <div class="qual-grid">
+        <div class="qual-item">
+          <label for="qualCustomerName">Customer name</label>
+          <input id="qualCustomerName" type="text" placeholder="Your Company Ltd"/>
+        </div>
+        <div class="qual-item">
+          <label for="qualUsers">Number of users</label>
+          <input class="num" id="qualUsers" type="number" min="0" step="1" value="40"/>
+        </div>
+        <div class="qual-item">
+          <label for="qualCompanies">Number of companies/legal entities</label>
+          <input class="num" id="qualCompanies" type="number" min="0" step="1" value="2"/>
+        </div>
+        <div class="qual-item">
+          <label for="qualRegions">Number of regions/countries supported</label>
+          <input class="num" id="qualRegions" type="number" min="0" step="1" value="1"/>
+        </div>
+        <div class="qual-item">
+          <label for="qualSupportWindow">Preferred support window</label>
+          <select id="qualSupportWindow">
+            <option value="Mon-Fri 09:00-17:30 (UK)" selected>Mon-Fri 09:00-17:30 (UK)</option>
+            <option value="Mon-Fri 08:00-18:00 (EMEA)">Mon-Fri 08:00-18:00 (EMEA)</option>
+            <option value="Follow-the-sun">Follow-the-sun</option>
+          </select>
+        </div>
+        <div class="qual-item full">
+          <label>Active timezones</label>
+          <div class="tz-seg" role="group" aria-label="Active timezones">
+            <input type="checkbox" id="tzUk" checked><label for="tzUk">UK</label>
+            <input type="checkbox" id="tzEurope"><label for="tzEurope">Europe</label>
+            <input type="checkbox" id="tzMiddleEast"><label for="tzMiddleEast">Middle East</label>
+            <input type="checkbox" id="tzNorthAmerica"><label for="tzNorthAmerica">North America</label>
+            <input type="checkbox" id="tzAsiaPacific"><label for="tzAsiaPacific">Asia Pacific</label>
+          </div>
+          <div class="qual-warn" id="activeTimezoneWarn"></div>
+        </div>
+        <div class="qual-item full">
+          <label for="qualNotes">Anything we should know?</label>
+          <textarea id="qualNotes" placeholder="e.g. month-end critical windows, integrations, approval-heavy changes"></textarea>
+        </div>
+      </div>
+      <div class="qual-summary">
+        <div>Estimate accuracy level: <span class="qual-badge" id="qualConfidence">High</span></div>
+        <div id="qualFlags">Flags: none.</div>
+      </div>
+      </div>
+      <div id="customerInfoPreview" class="small card-compact-preview" style="display:none;"></div>
+    </section>
+
+    <div class="grid">
+      <div class="col">
+      <section class="card">
+        <div class="card-toggle-head">
+          <p class="hint">1) Select services and initial response targets.</p>
+          <button type="button" class="primary" id="serviceCardSubmit" aria-expanded="true">Done</button>
+        </div>
+        <div id="serviceCardPanel">
+        <p class="hint">Indicative estimate for NAV/BC services. Final scope and quote follow discovery.</p>
+        <p class="hint">SLA targets here are for initial response only, not full resolution.</p>
+        <div class="svc-grid">
+          <div class="service" id="card-lic">
+            <div class="service-top">
+              <input type="checkbox" id="licOn"/>
+              <b>Licensing &amp; Environment Governance (NAV/BC)</b>
+            </div>
+            <div class="chips">
+              <input type="radio" name="licRt" id="licRt2d" value="Within 2 business days" checked>
+              <label for="licRt2d">2 business days</label>
+              <input type="radio" name="licRt" id="licRtNext" value="Next business day">
+              <label for="licRtNext">Next business day</label>
+              <input type="radio" name="licRt" id="licRtSame" value="Same day">
+              <label for="licRtSame">Same day</label>
+              <input type="radio" name="licRt" id="licRt1h" value="Within 1 business hour">
+              <label for="licRt1h">1 business hour</label>
+            </div>
+            <div class="service-metric">
+              <label for="licExecHours">Requests / month</label>
+              <input class="num" id="licExecHours" type="number" min="0" step="1" value="1"/>
+            </div>
+          </div>
+
+          <div class="service" id="card-sup">
+            <div class="service-top">
+              <input type="checkbox" id="supOn"/>
+              <b>Application Support (NAV/BC)</b>
+            </div>
+            <div class="chips">
+              <input type="radio" name="supRt" id="supRt2d" value="Within 2 business days" checked>
+              <label for="supRt2d">2 business days</label>
+              <input type="radio" name="supRt" id="supRtNext" value="Next business day">
+              <label for="supRtNext">Next business day</label>
+              <input type="radio" name="supRt" id="supRtSame" value="Same day">
+              <label for="supRtSame">Same day</label>
+              <input type="radio" name="supRt" id="supRt4h" value="Within 4 business hours">
+              <label for="supRt4h">4 business hours</label>
+              <input type="radio" name="supRt" id="supRt1h" value="Within 1 business hour">
+              <label for="supRt1h">1 business hour</label>
+            </div>
+            <div class="service-metric">
+              <label for="supExecHours">Tickets / month</label>
+              <input class="num" id="supExecHours" type="number" min="0" step="1" value="5"/>
+            </div>
+          </div>
+
+          <div class="service" id="card-dev">
+            <div class="service-top">
+              <input type="checkbox" id="devOn"/>
+              <b>Change Delivery (NAV/BC)</b>
+            </div>
+            <div class="chips">
+              <input type="radio" name="devRt" id="devRt2d" value="Within 2 business days" checked>
+              <label for="devRt2d">2 business days</label>
+              <input type="radio" name="devRt" id="devRtNext" value="Next business day">
+              <label for="devRtNext">Next business day</label>
+              <input type="radio" name="devRt" id="devRtSame" value="Same day">
+              <label for="devRtSame">Same day</label>
+            </div>
+            <div class="service-metric">
+              <label for="devExecHours">Requests / month</label>
+              <input class="num" id="devExecHours" type="number" min="0" step="1" value="1"/>
+            </div>
+            <div class="dev-scope">
+              <p class="scope-title">Change request scope options</p>
+              <div class="scope-list">
+                <label class="scope-item"><input type="checkbox" id="devScopeInitial" checked/> Initial Analysis <span class="scope-hours">(min 2h)</span></label>
+                <label class="scope-item"><input type="checkbox" id="devScopeFrd" checked/> Functional Requirements Document <span class="scope-hours">(min 2h)</span></label>
+                <label class="scope-item"><input type="checkbox" id="devScopeSpecReview" checked/> Specification Review <span class="scope-hours">(min 1h)</span></label>
+                <label class="scope-item"><input type="checkbox" id="devScopeTechSpec"/> Technical Specification <span class="scope-hours">(min 1h)</span></label>
+                <label class="scope-item"><input type="checkbox" id="devScopeBuild" checked/> Development <span class="scope-hours">(min 4h)</span></label>
+                <label class="scope-item"><input type="checkbox" id="devScopeTesting" checked/> Testing <span class="scope-hours">(min 1h)</span></label>
+                <label class="scope-item"><input type="checkbox" id="devScopeTraining"/> Key User Training <span class="scope-hours">(min 1h)</span></label>
+                <label class="scope-item"><input type="checkbox" id="devScopeWorkInstruction"/> Work Instruction <span class="scope-hours">(min 4h)</span></label>
+                <label class="scope-item"><input type="checkbox" id="devScopeDeployment"/> Deployment <span class="scope-hours">(min 1h)</span></label>
+              </div>
+              <div class="scope-total">Selected scope minimum: <b id="devScopeTotal">0.0h</b></div>
+            </div>
+          </div>
+
+          <div class="service" id="card-strat">
+            <div class="service-top">
+              <input type="checkbox" id="stratOn"/>
+              <b>Architecture &amp; Transformation Strategy</b>
+            </div>
+            <div class="chips">
+              <input type="radio" name="stratRt" id="stratRt5d" value="Within 5 business days" checked>
+              <label for="stratRt5d">5 business days</label>
+              <input type="radio" name="stratRt" id="stratRt2d" value="Within 2 business days">
+              <label for="stratRt2d">2 business days</label>
+              <input type="radio" name="stratRt" id="stratRtNext" value="Next business day">
+              <label for="stratRtNext">Next business day</label>
+            </div>
+            <div class="service-metric">
+              <label for="stratExecHours">Requests / month</label>
+              <input class="num" id="stratExecHours" type="number" min="0" step="1" value="1"/>
+            </div>
+            <div class="strat-scope" id="stratScopeSection">
+              <p class="scope-title">Transformation strategy options</p>
+              <div class="scope-list">
+                <label class="scope-item"><input type="checkbox" id="stratScopeVision"/> Vision & Stakeholder Alignment</label>
+                <label class="scope-item"><input type="checkbox" id="stratScopeImpact"/> Change Impact Assessment</label>
+                <label class="scope-item"><input type="checkbox" id="stratScopeRoadmap"/> Transformation Roadmap</label>
+                <label class="scope-item"><input type="checkbox" id="stratScopeComms"/> Adoption & Communications Plan</label>
+                <label class="scope-item"><input type="checkbox" id="stratScopeTraining"/> Training Strategy</label>
+                <label class="scope-item"><input type="checkbox" id="stratScopeGovernance"/> Governance Model</label>
+                <label class="scope-item"><input type="checkbox" id="stratScopeKpi"/> KPI & Benefits Tracking</label>
+                <label class="scope-item"><input type="checkbox" id="stratScopeRisk"/> Risk & Dependency Planning</label>
+                <label class="scope-item"><input type="checkbox" id="stratScopeOptimization"/> Post-Go-Live Optimization Plan</label>
+              </div>
+              <div class="scope-total">Selected scope minimum: <b id="stratScopeTotal">0.0h/request</b></div>
+              <div class="qual-warn" id="stratScopeWarn"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <button type="button" class="collapse-toggle" id="assumptionsToggle" aria-expanded="false">
+            <span>2) Business calendar assumptions (initial response SLA)</span>
+            <span id="assumptionsToggleIcon">+</span>
+          </button>
+          <div class="collapse-panel" id="assumptionsPanel">
+            <table>
+              <tbody>
+                <tr>
+                  <td>Business day start</td>
+                  <td><input class="num" id="startTime" type="time" value="09:00"/></td>
+                  <td class="small">Used to show check times for interval tiers.</td>
+                </tr>
+                <tr>
+                  <td>Business hours per day</td>
+                  <td><input class="num" id="hoursPerDay" type="number" min="1" step="0.5" value="8.5"/></td>
+                  <td class="small">Used for interval-based tiers (1h / 4h) and same-day preview spacing.</td>
+                </tr>
+                <tr>
+                  <td>Business days per month</td>
+                  <td><input class="num" id="daysPerMonth" type="number" min="1" step="0.1" value="21.7"/></td>
+                  <td class="small">Default 21.7 business days/month.</td>
+                </tr>
+                <tr>
+                  <td>Weeks per month</td>
+                  <td><input class="num" id="weeksPerMonth" type="number" min="1" step="0.01" value="4.33"/></td>
+                  <td class="small">Used for weekly cadence tiers.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        </div>
+        <div id="serviceCardPreview" class="small card-compact-preview" style="display:none;"></div>
+      </section>
+      </div>
+
+      <div class="col">
+      <section class="card">
+        <div class="card-toggle-head">
+          <p class="hint">Assumptions, tiers and rates</p>
+          <button type="button" class="primary" id="planningCardSubmit" aria-expanded="true">Done</button>
+        </div>
+        <div id="planningCardPanel">
+        <button type="button" class="collapse-toggle" id="tiersToggle" aria-expanded="false">
+          <span>3) Tier assumptions (initial response)</span>
+          <span id="tiersToggleIcon">+</span>
+        </button>
+        <div class="collapse-panel" id="tiersPanel">
+          <p class="hint">Your anchor rule is pre-filled.</p>
+          <table>
+            <thead>
+              <tr><th>Initial Response Tier</th><th>Model</th><th>Cadence</th><th>Min/check</th><th>Check Times Preview</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Within 1 business hour</td>
+                <td>Interval</td>
+                <td>every <input class="num" id="cad_1h" type="number" min="1" step="1" value="45"/> min</td>
+                <td><input class="num" id="dur_1h" type="number" min="1" step="1" value="5"/></td>
+                <td><div class="schedule-preview" id="preview1h"></div><div class="warn" id="warn1h"></div></td>
+              </tr>
+              <tr>
+                <td>Within 4 business hours</td>
+                <td>Interval</td>
+                <td>every <input class="num" id="cad_4h" type="number" min="30" max="225" step="1" value="225"/> min</td>
+                <td><input class="num" id="dur_4h" type="number" min="1" step="1" value="5"/></td>
+                <td><div class="schedule-preview" id="preview4h"></div><div class="warn" id="warn4h"></div></td>
+              </tr>
+              <tr>
+                <td>Same day</td>
+                <td>Daily</td>
+                <td>
+                  <input class="num" id="cad_same" type="number" min="1" step="1" value="2"/> checks/day
+                </td>
+                <td><input class="num" id="dur_same" type="number" min="1" step="1" value="5"/></td>
+                <td><div class="schedule-preview" id="previewSame"></div><div class="warn" id="warnSame"></div></td>
+              </tr>
+              <tr>
+                <td>Next business day</td>
+                <td>Weekly</td>
+                <td><input class="num" id="cad_next" type="number" min="1" step="1" value="5"/> checks/week</td>
+                <td><input class="num" id="dur_next" type="number" min="1" step="1" value="8"/></td>
+                <td class="small">Not interval-based</td>
+              </tr>
+              <tr>
+                <td>Within 2 business days</td>
+                <td>Weekly</td>
+                <td><input class="num" id="cad_2d" type="number" min="1" step="1" value="3"/> checks/week</td>
+                <td><input class="num" id="dur_2d" type="number" min="1" step="1" value="5"/></td>
+                <td class="small">Not interval-based</td>
+              </tr>
+              <tr>
+                <td>Within 5 business days</td>
+                <td>Weekly</td>
+                <td><input class="num" id="cad_5d" type="number" min="1" step="1" value="2"/> checks/week</td>
+                <td><input class="num" id="dur_5d" type="number" min="1" step="1" value="10"/></td>
+                <td class="small">Not interval-based</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+        <div class="subsection-divider" aria-hidden="true"></div>
+
+        <button type="button" class="collapse-toggle" id="ratesToggle" aria-expanded="false">
+          <span>4) Rates and cost output</span>
+          <span id="ratesToggleIcon">+</span>
+        </button>
+        <div class="collapse-panel" id="ratesPanel">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" id="showRates" checked/>
+            <b>Show rates and cost output</b>
+          </div>
+          <div class="small" style="margin-top:4px;">When enabled, table and summary include monthly cost by service.</div>
+
+          <div class="section-label"><b>Coverage rate</b> (shared initial-response monitoring)</div>
+          <div class="rate-grid">
+            <div class="rate-item">
+              <label for="coverageRate">Coverage rate (per hour)</label>
+              <input class="num" id="coverageRate" type="number" min="0" step="1" value="150"/>
+            </div>
+          </div>
+
+          <div class="section-label"><b>Service rates</b> (delivery/execution)</div>
+          <div class="rate-grid">
+            <div class="rate-item">
+              <label for="rateLic">Licence management rate (per hour)</label>
+              <input class="num" id="rateLic" type="number" min="0" step="1" value="150"/>
+            </div>
+            <div class="rate-item">
+              <label for="rateSup">Support rate (per hour)</label>
+              <input class="num" id="rateSup" type="number" min="0" step="1" value="150"/>
+            </div>
+            <div class="rate-item">
+              <label for="rateDev">Development rate (per hour)</label>
+              <input class="num" id="rateDev" type="number" min="0" step="1" value="150"/>
+            </div>
+            <div class="rate-item">
+              <label for="rateStrat">Strategy rate (per hour)</label>
+              <input class="num" id="rateStrat" type="number" min="0" step="1" value="150"/>
+            </div>
+          </div>
+
+        </div>
+        </div>
+        <div id="planningCardPreview" class="small card-compact-preview" style="display:none;"></div>
+      </section>
+
+    <section class="card">
+      <p class="hint">Breakdown</p>
+      <div class="kpi breakdown-kpi">
+        <div class="box">
+          <div class="n" id="totalHours">0.0</div>
+          <div class="t">Monthly calendar hours required</div>
+        </div>
+        <div class="box">
+          <div class="n" id="execHoursTotal">0.0</div>
+          <div class="t">Planned execution hours/month</div>
+        </div>
+        <div class="box">
+          <div class="n" id="ftePct">0%</div>
+          <div class="t">Share of one FTE month (173.6h baseline)</div>
+        </div>
+        <div class="box" id="costKpiBox" style="display:none;">
+          <div class="n" id="totalCost">&pound;0</div>
+          <div class="t">Estimated monthly cost (coverage + execution)</div>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Initial Response Target</th>
+            <th>Monthly Hours</th>
+            <th class="rate-col">Rate</th>
+            <th class="rate-col">Monthly Cost</th>
+            <th>How Calculated</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="actions">
+        <button class="primary" id="copyBtn" type="button">Copy breakdown</button>
+        <button id="jsonBtn" type="button">Download JSON</button>
+      </div>
+      <pre id="summary"></pre>
+      <div class="small" style="margin-top:8px">Coverage overhead is driven by initial-response SLA commitments. Execution buckets are planned delivery effort and costed separately.</div>
+    </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const gbp = new Intl.NumberFormat("en-GB", { style:"currency", currency:"GBP", maximumFractionDigits:0 });
+    const THEME_KEY = "requirements-calculator-theme";
+    let customerInfoCollapsed = false;
+    let serviceCardCollapsed = false;
+    let planningCardCollapsed = false;
+
+    function applyTheme(mode){
+      if (mode === "light" || mode === "dark"){
+        document.documentElement.setAttribute("data-theme", mode);
+      } else {
+        document.documentElement.removeAttribute("data-theme");
+      }
+      $("themeMode").value = mode;
+    }
+
+    function initTheme(){
+      const saved = localStorage.getItem(THEME_KEY);
+      const mode = (saved === "light" || saved === "dark") ? saved : "system";
+      applyTheme(mode);
+
+      $("themeMode").addEventListener("change", () => {
+        const next = $("themeMode").value;
+        if (next === "system"){
+          localStorage.removeItem(THEME_KEY);
+          applyTheme("system");
+        } else {
+          localStorage.setItem(THEME_KEY, next);
+          applyTheme(next);
+        }
+      });
+    }
+
+    function num(id, fallback = 0){
+      const n = Number($(id).value);
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function selectedRadio(name){
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : "";
+    }
+
+    function setCardState(onId, cardId){
+      const on = $(onId).checked;
+      const card = $(cardId);
+      card.classList.toggle("disabled", !on);
+      card.classList.toggle("active", on);
+    }
+
+    function assumptions(){
+      return {
+        "Within 1 business hour": { mode:"interval", cadence:num("cad_1h",45), duration:num("dur_1h",5) },
+        "Within 4 business hours": { mode:"interval", cadence:num("cad_4h",225), duration:num("dur_4h",5) },
+        "Same day": { mode:"daily", cadence:num("cad_same",2), duration:num("dur_same",5) },
+        "Next business day": { mode:"weekly", cadence:num("cad_next",5), duration:num("dur_next",8) },
+        "Within 2 business days": { mode:"weekly", cadence:num("cad_2d",3), duration:num("dur_2d",5) },
+        "Within 5 business days": { mode:"weekly", cadence:num("cad_5d",2), duration:num("dur_5d",10) }
+      };
+    }
+
+    function intervalCheckCount(hoursPerDay, cadenceMinutes){
+      const dayMins = Math.max(1, Math.round(hoursPerDay * 60));
+      const cadence = Math.max(1, Math.round(cadenceMinutes));
+      let checks = 0;
+      for (let t = 0; t <= dayMins; t += cadence){
+        checks++;
+      }
+      return checks;
+    }
+
+    function monthlyHoursForTier(rt, cfg, calendar){
+      if (!cfg) return { hours:0, formula:"No assumption configured" };
+      const minsPerMonth = (() => {
+        if (cfg.mode === "interval"){
+          const checksPerDay = intervalCheckCount(calendar.hoursPerDay, cfg.cadence);
+          return checksPerDay * cfg.duration * calendar.daysPerMonth;
+        }
+        if (cfg.mode === "weekly"){
+          return cfg.cadence * cfg.duration * calendar.weeksPerMonth;
+        }
+        if (cfg.mode === "daily"){
+          return cfg.cadence * cfg.duration * calendar.daysPerMonth;
+        }
+        return 0;
+      })();
+      const hours = minsPerMonth / 60;
+
+      let formula = "";
+      if (cfg.mode === "interval"){
+        const checksPerDay = intervalCheckCount(calendar.hoursPerDay, cfg.cadence);
+        formula = `${checksPerDay} checks/day x ${cfg.duration} min x ${calendar.daysPerMonth.toFixed(1)} days`;
+      } else if (cfg.mode === "weekly"){
+        formula = `${cfg.cadence} checks/week x ${cfg.duration} min x ${calendar.weeksPerMonth.toFixed(2)} weeks`;
+      } else {
+        formula = `${cfg.cadence} checks/day x ${cfg.duration} min x ${calendar.daysPerMonth.toFixed(1)} days`;
+      }
+      return { hours, formula };
+    }
+
+    function parseStartMins(){
+      const raw = $("startTime").value || "09:00";
+      const m = /^(\d{2}):(\d{2})$/.exec(raw);
+      if (!m) return 9 * 60;
+      return (Number(m[1]) * 60) + Number(m[2]);
+    }
+
+    function fmtMins(total){
+      const hh = Math.floor(total / 60) % 24;
+      const mm = total % 60;
+      return `${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
+    }
+
+    function buildIntervalSchedule(cadenceMinutes, startMinutes, hoursPerDay){
+      const out = [];
+      const endMinutes = startMinutes + Math.round(hoursPerDay * 60);
+      const step = Math.max(1, Math.round(cadenceMinutes));
+      for (let t = startMinutes; t <= endMinutes; t += step){
+        out.push(fmtMins(t));
+      }
+      return out.join("; ");
+    }
+
+    function buildDailySchedule(checksPerDay, startMinutes, hoursPerDay){
+      const out = [];
+      const dayMinutes = Math.round(hoursPerDay * 60);
+      const checks = Math.max(1, Math.round(checksPerDay));
+      for (let i = 1; i <= checks; i++){
+        const offset = Math.round((i / checks) * dayMinutes);
+        out.push(fmtMins(startMinutes + offset));
+      }
+      return out.join("; ");
+    }
+
+    function validateIntervalCadence(cadenceId, durationId, targetMinutes, warnId, minBound = 1, maxBound = Number.POSITIVE_INFINITY){
+      const cadenceEl = $(cadenceId);
+      const duration = Math.max(1, num(durationId, 1));
+      const maxCadenceByTier = Math.max(1, targetMinutes - duration - 1);
+      const maxCadence = Math.max(1, Math.min(maxCadenceByTier, maxBound));
+      const minCadence = Math.max(1, minBound);
+      const rawCadence = Math.max(1, num(cadenceId, 1));
+      const fixedCadence = Math.min(Math.max(rawCadence, minCadence), maxCadence);
+
+      if (fixedCadence !== rawCadence){
+        cadenceEl.value = String(fixedCadence);
+        $(warnId).textContent = `Cadence adjusted to ${fixedCadence} min (allowed ${minCadence}-${maxCadence} min for this tier).`;
+      } else {
+        $(warnId).textContent = "";
+      }
+    }
+
+    function readSelection(){
+      return [
+        { name:"Licence management", on:$("licOn").checked, rt:selectedRadio("licRt") },
+        { name:"Support", on:$("supOn").checked, rt:selectedRadio("supRt") },
+        { name:"Development", on:$("devOn").checked, rt:selectedRadio("devRt") },
+        { name:"Strategy", on:$("stratOn").checked, rt:selectedRadio("stratRt") }
+      ];
+    }
+
+    function rates(){
+      return {
+        "Licence management": Math.max(0, num("rateLic", 150)),
+        "Support": Math.max(0, num("rateSup", 150)),
+        "Development": Math.max(0, num("rateDev", 150)),
+        "Strategy": Math.max(0, num("rateStrat", 150))
+      };
+    }
+
+    function executionHours(){
+      return {
+        "Licence management": Math.max(0, num("licExecHours", 1)),
+        "Support": Math.max(0, num("supExecHours", 5)),
+        "Development": Math.max(0, num("devExecHours", 1)),
+        "Strategy": Math.max(0, num("stratExecHours", 1))
+      };
+    }
+
+    function developmentScopeSelection(){
+      const options = [
+        { id:"devScopeInitial", label:"Initial Analysis", hours:2 },
+        { id:"devScopeFrd", label:"Functional Requirements Document", hours:2 },
+        { id:"devScopeSpecReview", label:"Specification Review", hours:1 },
+        { id:"devScopeTechSpec", label:"Technical Specification", hours:1 },
+        { id:"devScopeBuild", label:"Development", hours:4 },
+        { id:"devScopeTesting", label:"Testing", hours:1 },
+        { id:"devScopeTraining", label:"Key User Training", hours:1 },
+        { id:"devScopeWorkInstruction", label:"Work Instruction", hours:4 },
+        { id:"devScopeDeployment", label:"Deployment", hours:1 }
+      ];
+      const selected = options.filter(x => $(x.id).checked);
+      const total = selected.reduce((sum, x) => sum + x.hours, 0);
+      const displayTotal = `${total.toFixed(1)}h`;
+      return { selected, total, displayTotal, hours_per_request:total };
+    }
+
+    function tierPriority(rt){
+      const order = {
+        "Within 1 business hour": 1,
+        "Within 4 business hours": 2,
+        "Same day": 3,
+        "Next business day": 4,
+        "Within 2 business days": 5,
+        "Within 5 business days": 6
+      };
+      return order[rt] ?? 999;
+    }
+
+    function strictestActiveTier(selectedServices){
+      if (!selectedServices.length) return null;
+      let strictest = selectedServices[0].rt;
+      for (const svc of selectedServices){
+        if (tierPriority(svc.rt) < tierPriority(strictest)){
+          strictest = svc.rt;
+        }
+      }
+      return strictest;
+    }
+
+    function volumeUnitForService(serviceName){
+      return serviceName === "Support" ? "tickets" : "requests";
+    }
+
+    function displayServiceName(serviceName){
+      const labels = {
+        "Licence management": "Licensing & Environment Governance (NAV/BC)",
+        "Support": "Application Support (NAV/BC)",
+        "Development": "Change Delivery (NAV/BC)",
+        "Strategy": "Architecture & Transformation Strategy"
+      };
+      return labels[serviceName] || serviceName;
+    }
+
+    function strategyScopeSelection(){
+      const options = [
+        { id:"stratScopeVision", label:"Vision & Stakeholder Alignment" },
+        { id:"stratScopeImpact", label:"Change Impact Assessment" },
+        { id:"stratScopeRoadmap", label:"Transformation Roadmap" },
+        { id:"stratScopeComms", label:"Adoption & Communications Plan" },
+        { id:"stratScopeTraining", label:"Training Strategy" },
+        { id:"stratScopeGovernance", label:"Governance Model" },
+        { id:"stratScopeKpi", label:"KPI & Benefits Tracking" },
+        { id:"stratScopeRisk", label:"Risk & Dependency Planning" },
+        { id:"stratScopeOptimization", label:"Post-Go-Live Optimization Plan" }
+      ];
+      const selected = options.filter(x => $(x.id).checked).map(x => x.label);
+      const count = selected.length;
+      const hoursPerOption = 4;
+      const hoursPerRequest = count * hoursPerOption;
+      return {
+        selected,
+        count,
+        hours_per_option:hoursPerOption,
+        hours_per_request:hoursPerRequest
+      };
+    }
+
+    function qualificationSelection(){
+      const activeTimezones = [];
+      if ($("tzUk").checked) activeTimezones.push("UK");
+      if ($("tzEurope").checked) activeTimezones.push("Europe");
+      if ($("tzMiddleEast").checked) activeTimezones.push("Middle East");
+      if ($("tzNorthAmerica").checked) activeTimezones.push("North America");
+      if ($("tzAsiaPacific").checked) activeTimezones.push("Asia Pacific");
+      return {
+        customer_name: ($("qualCustomerName").value || "").trim(),
+        users: Math.max(0, num("qualUsers", 40)),
+        companies: Math.max(0, num("qualCompanies", 2)),
+        regions: Math.max(0, num("qualRegions", 1)),
+        support_window: $("qualSupportWindow").value || "Mon-Fri 09:00-17:30 (UK)",
+        active_timezones: activeTimezones,
+        notes: ($("qualNotes").value || "").trim()
+      };
+    }
+
+    function qualificationAssessment(qual){
+      let riskScore = 0;
+      const flags = [];
+      if (qual.users >= 100){
+        riskScore += 1;
+        flags.push("Larger user base");
+      }
+      if (qual.companies >= 4){
+        riskScore += 1;
+        flags.push("Multi-company setup");
+      }
+      if (qual.regions >= 3){
+        riskScore += 1;
+        flags.push("Multi-region setup");
+      }
+      if ((qual.support_window || "").toLowerCase().includes("follow-the-sun")){
+        riskScore += 1;
+        flags.push("Extended support coverage");
+      }
+      if ((qual.active_timezones || []).length >= 3){
+        riskScore += 1;
+        flags.push("Multi-timezone operations");
+      }
+      if (qual.users >= 300){
+        riskScore += 1;
+        flags.push("Enterprise-scale user count");
+      }
+      const confidence = riskScore <= 1 ? "High" : (riskScore <= 3 ? "Medium" : "Low");
+      return { risk_score:riskScore, confidence, flags };
+    }
+
+    function updateCustomerInfoPreview(qualification){
+      const name = qualification.customer_name || "Customer";
+      const tz = (qualification.active_timezones || []).length ? qualification.active_timezones.join(", ") : "none selected";
+      $("customerInfoPreview").textContent = `${name}: ${qualification.users.toFixed(0)} users, ${qualification.companies.toFixed(0)} companies, ${qualification.regions.toFixed(0)} regions. Active timezones: ${tz}.`;
+    }
+
+    function setCustomerInfoCollapsed(collapsed){
+      customerInfoCollapsed = collapsed;
+      $("customerInfoPanel").style.display = collapsed ? "none" : "block";
+      $("customerInfoPreview").style.display = collapsed ? "block" : "none";
+      const btn = $("customerInfoSubmit");
+      btn.textContent = collapsed ? "Edit" : "Done";
+      btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    }
+
+    function setToggleCardCollapsed(panelId, previewId, buttonId, collapsed){
+      $(panelId).style.display = collapsed ? "none" : "block";
+      $(previewId).style.display = collapsed ? "block" : "none";
+      const btn = $(buttonId);
+      btn.textContent = collapsed ? "Edit" : "Done";
+      btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    }
+
+    function setServiceCardCollapsed(collapsed){
+      serviceCardCollapsed = collapsed;
+      setToggleCardCollapsed("serviceCardPanel", "serviceCardPreview", "serviceCardSubmit", collapsed);
+    }
+
+    function setPlanningCardCollapsed(collapsed){
+      planningCardCollapsed = collapsed;
+      setToggleCardCollapsed("planningCardPanel", "planningCardPreview", "planningCardSubmit", collapsed);
+    }
+
+    const PANEL_CONFIGS = [
+      { toggleId:"assumptionsToggle", panelId:"assumptionsPanel", iconId:"assumptionsToggleIcon" },
+      { toggleId:"tiersToggle", panelId:"tiersPanel", iconId:"tiersToggleIcon" },
+      { toggleId:"ratesToggle", panelId:"ratesPanel", iconId:"ratesToggleIcon" }
+    ];
+
+    function setPanelInteractivity(panelEl, enabled){
+      const controls = panelEl.querySelectorAll("input, select, textarea, button");
+      for (const control of controls){
+        if (enabled){
+          const prev = control.getAttribute("data-panel-prev-disabled");
+          if (prev !== null){
+            control.disabled = prev === "1";
+            control.removeAttribute("data-panel-prev-disabled");
+          }
+        } else {
+          if (!control.hasAttribute("data-panel-prev-disabled")){
+            control.setAttribute("data-panel-prev-disabled", control.disabled ? "1" : "0");
+          }
+          control.disabled = true;
+        }
+      }
+    }
+
+    function setPanelOpen(toggleId, panelId, iconId, isOpen){
+      const panel = $(panelId);
+      panel.classList.toggle("open", isOpen);
+      $(toggleId).setAttribute("aria-expanded", isOpen ? "true" : "false");
+      $(iconId).textContent = isOpen ? "-" : "+";
+      panel.style.maxHeight = isOpen ? `${panel.scrollHeight}px` : "0px";
+      panel.setAttribute("aria-hidden", isOpen ? "false" : "true");
+      setPanelInteractivity(panel, isOpen);
+    }
+
+    function refreshOpenPanelHeights(){
+      for (const cfg of PANEL_CONFIGS){
+        const panel = $(cfg.panelId);
+        if (panel.classList.contains("open")){
+          panel.style.maxHeight = `${panel.scrollHeight}px`;
+        }
+      }
+    }
+
+    function setRateVisibility(show){
+      const rateCells = document.querySelectorAll(".rate-col");
+      for (const el of rateCells){
+        el.classList.toggle("hidden-col", !show);
+      }
+      $("costKpiBox").style.display = show ? "block" : "none";
+    }
+
+    function render(){
+      setCardState("licOn", "card-lic");
+      setCardState("supOn", "card-sup");
+      setCardState("devOn", "card-dev");
+      setCardState("stratOn", "card-strat");
+
+      const calendar = {
+        hoursPerDay:num("hoursPerDay",8.5),
+        daysPerMonth:num("daysPerMonth",21.7),
+        weeksPerMonth:num("weeksPerMonth",4.33)
+      };
+      const map = assumptions();
+      validateIntervalCadence("cad_1h", "dur_1h", 60, "warn1h");
+      validateIntervalCadence("cad_4h", "dur_4h", 240, "warn4h", 30, 225);
+      $("warnSame").textContent = "";
+
+      // Re-read after any auto-adjustments.
+      const mapValidated = assumptions();
+      const selected = readSelection().filter(x => x.on);
+      const showRates = $("showRates").checked;
+      const coverageRate = Math.max(0, num("coverageRate", 150));
+      const rateMap = rates();
+      const execHoursMap = executionHours();
+      const devScope = developmentScopeSelection();
+      const strategyScope = strategyScopeSelection();
+      const qualification = qualificationSelection();
+      const qualificationResult = qualificationAssessment(qualification);
+      const hasActiveTimezones = (qualification.active_timezones || []).length > 0;
+      const selectedForCalc = hasActiveTimezones ? selected : [];
+      const rows = [];
+      let coverageHours = 0;
+      let executionHoursTotal = 0;
+      let coverageCost = 0;
+      let executionCostTotal = 0;
+      let totalCost = 0;
+
+      const strictestTier = strictestActiveTier(selectedForCalc);
+      const strictestCalc = strictestTier ? monthlyHoursForTier(strictestTier, mapValidated[strictestTier], calendar) : { hours:0, formula:"" };
+
+      if (strictestTier){
+        coverageHours = strictestCalc.hours;
+        coverageCost = coverageHours * coverageRate;
+        rows.push({
+          type: "coverage",
+          service: "Shared coverage overhead",
+          rt: strictestTier,
+          hours: coverageHours,
+          hoursText: coverageHours.toFixed(1),
+          formula: `Driven by strictest selected initial-response tier. ${strictestCalc.formula}`,
+          rate: coverageRate,
+          cost: coverageCost
+        });
+      }
+
+      for (const svc of selectedForCalc){
+        const volumePerMonth = execHoursMap[svc.name] || 0;
+        const effortPerRequest =
+          svc.name === "Development" ? Math.max(0, devScope.hours_per_request) :
+          (svc.name === "Strategy" ? Math.max(0, strategyScope.hours_per_request) : 1);
+        const volumeUnit = volumeUnitForService(svc.name);
+        const execHours = volumePerMonth * effortPerRequest;
+        const execRate = rateMap[svc.name] || 0;
+        const execCost = execHours * execRate;
+        executionHoursTotal += execHours;
+        executionCostTotal += execCost;
+        rows.push({
+          type: "execution",
+          service: `${displayServiceName(svc.name)} execution`,
+          rt: "Execution",
+          hours: execHours,
+          hoursText: execHours.toFixed(1),
+          formula: `${volumePerMonth.toFixed(1)} ${volumeUnit} x ${effortPerRequest.toFixed(1)} h/${volumeUnit.slice(0, -1)} x ${gbp.format(execRate)}/hr`,
+          rate: execRate,
+          cost: execCost
+        });
+      }
+      totalCost = coverageCost + executionCostTotal;
+
+      const tbody = $("rows");
+      tbody.innerHTML = "";
+      if (!rows.length){
+        const tr = document.createElement("tr");
+        const msg = hasActiveTimezones ? "No services selected." : "Select at least one active timezone to generate totals.";
+        tr.innerHTML = `<td colspan="${showRates ? 6 : 4}" class="small">${msg}</td>`;
+        tbody.appendChild(tr);
+      } else {
+        for (const r of rows){
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.service}</td>
+            <td>${r.rt}</td>
+            <td>${r.hoursText ?? r.hours.toFixed(1)}</td>
+            <td class="rate-col">${gbp.format(r.rate)}</td>
+            <td class="rate-col">${gbp.format(r.cost)}</td>
+            <td>${r.formula}</td>`;
+          tbody.appendChild(tr);
+        }
+
+        const totalRow = document.createElement("tr");
+        totalRow.className = "total-row";
+        totalRow.innerHTML = `
+          <td>Total</td>
+          <td>All selected services</td>
+          <td>${(coverageHours + executionHoursTotal).toFixed(1)}</td>
+          <td class="rate-col">-</td>
+          <td class="rate-col">${gbp.format(totalCost)}</td>
+          <td>Coverage + execution</td>`;
+        tbody.appendChild(totalRow);
+      }
+
+      if (hasActiveTimezones){
+        $("totalHours").textContent = coverageHours.toFixed(1);
+        $("execHoursTotal").textContent = executionHoursTotal.toFixed(1);
+        $("ftePct").textContent = `${Math.round((coverageHours / 173.6) * 100)}%`;
+        $("totalCost").textContent = gbp.format(totalCost);
+      } else {
+        $("totalHours").textContent = "--";
+        $("execHoursTotal").textContent = "--";
+        $("ftePct").textContent = "--";
+        $("totalCost").textContent = "--";
+      }
+      $("devScopeTotal").textContent = devScope.displayTotal;
+      $("stratScopeTotal").textContent = `${strategyScope.hours_per_request.toFixed(1)}h/request`;
+      const strategyIsOn = $("stratOn").checked;
+      if (strategyIsOn && strategyScope.count === 0){
+        $("stratScopeWarn").textContent = "Select at least one strategy option to estimate Strategy delivery.";
+      } else {
+        $("stratScopeWarn").textContent = "";
+      }
+      $("activeTimezoneWarn").textContent = hasActiveTimezones ? "" : "Select at least one active timezone to generate totals.";
+      $("qualConfidence").textContent = qualificationResult.confidence;
+      $("qualFlags").textContent = qualificationResult.flags.length ? `Flags: ${qualificationResult.flags.join("; ")}` : "Flags: none.";
+      updateCustomerInfoPreview(qualification);
+      const selectedServiceLabels = selected.length ? selected.map(x => displayServiceName(x.name)).join(", ") : "No services selected.";
+      $("serviceCardPreview").textContent = `Selected services: ${selectedServiceLabels}`;
+      $("planningCardPreview").textContent = `Strictest initial-response SLA: ${strictestTier || "none"} | Rates: ${showRates ? "shown" : "hidden"} | Coverage rate: ${gbp.format(coverageRate)}/hr${hasActiveTimezones ? "" : " | Totals blocked (no active timezone)"}`;
+      setRateVisibility(showRates);
+
+      const startMinutes = parseStartMins();
+      $("preview1h").textContent = buildIntervalSchedule(mapValidated["Within 1 business hour"].cadence, startMinutes, calendar.hoursPerDay);
+      $("preview4h").textContent = buildIntervalSchedule(mapValidated["Within 4 business hours"].cadence, startMinutes, calendar.hoursPerDay);
+      $("previewSame").textContent = buildDailySchedule(
+        mapValidated["Same day"].cadence,
+        startMinutes,
+        calendar.hoursPerDay
+      );
+
+      const lines = [];
+      const summaryWarnings = [];
+      const activeTimezoneWarning = $("activeTimezoneWarn").textContent.trim();
+      const strategyWarning = $("stratScopeWarn").textContent.trim();
+      const oneHourWarning = $("warn1h").textContent.trim();
+      const fourHourWarning = $("warn4h").textContent.trim();
+      const sameDayWarning = $("warnSame").textContent.trim();
+      if (activeTimezoneWarning) summaryWarnings.push(activeTimezoneWarning);
+      if (strategyWarning) summaryWarnings.push(`Strategy: ${strategyWarning}`);
+      if (oneHourWarning) summaryWarnings.push(`Within 1 business hour: ${oneHourWarning}`);
+      if (fourHourWarning) summaryWarnings.push(`Within 4 business hours: ${fourHourWarning}`);
+      if (sameDayWarning) summaryWarnings.push(`Same day: ${sameDayWarning}`);
+
+      lines.push("Requirements summary");
+      lines.push("All SLA commitments below are for initial response, not full resolution.");
+      lines.push("");
+
+      lines.push("Selected services and initial-response targets:");
+      if (selected.length){
+        for (const svc of selected){
+          const volumePerMonth = execHoursMap[svc.name] || 0;
+          const volumeUnit = volumeUnitForService(svc.name);
+          lines.push(`- ${displayServiceName(svc.name)}: ${svc.rt}; ${volumePerMonth.toFixed(1)} ${volumeUnit}/month`);
+        }
+      } else {
+        lines.push("- No services selected.");
+      }
+
+      lines.push("");
+      lines.push("Business calendar assumptions:");
+      lines.push(`- Business day start: ${$("startTime").value || "09:00"}`);
+      lines.push(`- Business hours/day: ${calendar.hoursPerDay.toFixed(1)}`);
+      lines.push(`- Business days/month: ${calendar.daysPerMonth.toFixed(1)}`);
+      lines.push(`- Weeks/month: ${calendar.weeksPerMonth.toFixed(2)}`);
+
+      lines.push("");
+      lines.push("Tier assumptions:");
+      const tierSummaryConfig = [
+        { key:"Within 1 business hour", previewId:"preview1h" },
+        { key:"Within 4 business hours", previewId:"preview4h" },
+        { key:"Same day", previewId:"previewSame" },
+        { key:"Next business day" },
+        { key:"Within 2 business days" },
+        { key:"Within 5 business days" }
+      ];
+      for (const tierCfg of tierSummaryConfig){
+        const cfg = mapValidated[tierCfg.key];
+        if (cfg.mode === "interval"){
+          const preview = $(tierCfg.previewId).textContent || "n/a";
+          lines.push(`- ${tierCfg.key}: every ${cfg.cadence} min, ${cfg.duration} min/check; check times ${preview}`);
+        } else if (cfg.mode === "daily"){
+          const preview = $(tierCfg.previewId).textContent || "n/a";
+          lines.push(`- ${tierCfg.key}: ${cfg.cadence} checks/day, ${cfg.duration} min/check; check times ${preview}`);
+        } else {
+          lines.push(`- ${tierCfg.key}: ${cfg.cadence} checks/week, ${cfg.duration} min/check`);
+        }
+      }
+
+      lines.push("");
+      lines.push("Rates and cost visibility:");
+      lines.push(`- Show rates and cost output: ${showRates ? "Yes" : "No"}`);
+      lines.push(`- Coverage rate: ${gbp.format(coverageRate)}/hr`);
+      lines.push(`- Licensing & Environment Governance rate: ${gbp.format(rateMap["Licence management"])}/hr`);
+      lines.push(`- Application Support rate: ${gbp.format(rateMap["Support"])}/hr`);
+      lines.push(`- Change Delivery rate: ${gbp.format(rateMap["Development"])}/hr`);
+      lines.push(`- Architecture & Transformation Strategy rate: ${gbp.format(rateMap["Strategy"])}/hr`);
+
+      lines.push("");
+      lines.push("Coverage and execution estimate:");
+      if (!hasActiveTimezones){
+        const strictestSelectedTier = strictestActiveTier(selected);
+        lines.push(`- Strictest selected initial-response tier: ${strictestSelectedTier || "none"}`);
+        lines.push("- Totals unavailable until at least one active timezone is selected.");
+      } else if (!rows.length){
+        lines.push("- No services selected.");
+      } else {
+        lines.push("Shared initial-response coverage:");
+        lines.push(`- Tier: ${strictestTier}`);
+        lines.push(`- Coverage hours/month: ${coverageHours.toFixed(1)} (${strictestCalc.formula})`);
+        if (showRates){
+          lines.push(`- Coverage cost: ${gbp.format(coverageCost)}`);
+        }
+
+        lines.push("");
+        lines.push("Service execution buckets:");
+        for (const svc of selected){
+          const volumePerMonth = execHoursMap[svc.name] || 0;
+          const effortPerRequest =
+            svc.name === "Development" ? Math.max(0, devScope.hours_per_request) :
+            (svc.name === "Strategy" ? Math.max(0, strategyScope.hours_per_request) : 1);
+          const volumeUnit = volumeUnitForService(svc.name);
+          const execHours = volumePerMonth * effortPerRequest;
+          const execRate = rateMap[svc.name] || 0;
+          const execCost = execHours * execRate;
+          const serviceLabel = displayServiceName(svc.name);
+          if (showRates){
+            lines.push(`- ${serviceLabel}: ${volumePerMonth.toFixed(1)} ${volumeUnit} x ${effortPerRequest.toFixed(1)} h/${volumeUnit.slice(0, -1)} x ${gbp.format(execRate)}/hr = ${gbp.format(execCost)}`);
+          } else {
+            lines.push(`- ${serviceLabel}: ${volumePerMonth.toFixed(1)} ${volumeUnit} at ${effortPerRequest.toFixed(1)} h/${volumeUnit.slice(0, -1)} = ${execHours.toFixed(1)} planned execution hrs`);
+          }
+          if (svc.name === "Development"){
+            const devNames = devScope.selected.length ? devScope.selected.map(x => x.label).join(", ") : "none selected";
+            lines.push(`  Development scope: ${devNames}`);
+            lines.push(`  Development scope minimum: ${devScope.hours_per_request.toFixed(1)}h/request`);
+          }
+          if (svc.name === "Strategy"){
+            const strategyNames = strategyScope.count ? strategyScope.selected.join(", ") : "none selected";
+            lines.push(`  Strategy options: ${strategyNames}`);
+            lines.push(`  Strategy scope minimum: ${strategyScope.hours_per_request.toFixed(1)}h/request`);
+          }
+        }
+      }
+
+      lines.push("");
+      const customerHeader = qualification.customer_name ? `Business setup (${qualification.customer_name})` : "Business setup";
+      lines.push(`${customerHeader}: ${qualification.users.toFixed(0)} users, ${qualification.companies.toFixed(0)} companies, ${qualification.regions.toFixed(0)} regions`);
+      lines.push(`Preferred support window: ${qualification.support_window}`);
+      lines.push(`Active timezones: ${(qualification.active_timezones || []).length ? qualification.active_timezones.join(", ") : "none selected"}`);
+      lines.push(`Estimate accuracy level: ${qualificationResult.confidence}`);
+      lines.push(`Confidence flags: ${qualificationResult.flags.length ? qualificationResult.flags.join(", ") : "none"}`);
+      lines.push(`Notes: ${qualification.notes || "none"}`);
+
+      lines.push("");
+      lines.push("Warnings:");
+      if (summaryWarnings.length){
+        for (const warning of summaryWarnings){
+          lines.push(`- ${warning}`);
+        }
+      } else {
+        lines.push("- None.");
+      }
+
+      lines.push("");
+      lines.push("Quick summaries:");
+      lines.push(`- Services card: ${$("serviceCardPreview").textContent || "n/a"}`);
+      lines.push(`- Planning card: ${$("planningCardPreview").textContent || "n/a"}`);
+
+      lines.push("");
+      lines.push("Totals:");
+      if (hasActiveTimezones){
+        lines.push(`- Coverage overhead: ${coverageHours.toFixed(1)} h/month`);
+        lines.push(`- Planned execution hours: ${executionHoursTotal.toFixed(1)} h/month`);
+        lines.push(`- FTE equivalent (coverage only, 173.6h baseline): ${Math.round((coverageHours / 173.6) * 100)}%`);
+        if (showRates){
+          lines.push(`- Coverage cost: ${gbp.format(coverageCost)}`);
+          lines.push(`- Execution cost total: ${gbp.format(executionCostTotal)}`);
+          lines.push(`- Overall monthly total: ${gbp.format(totalCost)}`);
+        } else {
+          lines.push("- Cost details hidden (enable 'Show rates and cost output').");
+        }
+      } else {
+        lines.push("- Totals unavailable until at least one active timezone is selected.");
+      }
+      $("summary").textContent = lines.join("\n");
+      refreshOpenPanelHeights();
+
+      return {
+        calendar,
+        assumptions:mapValidated,
+        show_rates:showRates,
+        rates:rateMap,
+        pricing:{
+          coverage_rate: coverageRate,
+          execution_hours:{
+            licence_management: execHoursMap["Licence management"] || 0,
+            support: execHoursMap["Support"] || 0,
+            development: execHoursMap["Development"] || 0,
+            strategy: execHoursMap["Strategy"] || 0
+          },
+          coverage_cost: coverageCost,
+          execution_cost_total: executionCostTotal,
+          total_cost: totalCost
+        },
+        strategy_scope:{
+          selected: $("stratOn").checked ? strategyScope.selected : [],
+          count: $("stratOn").checked ? strategyScope.count : 0,
+          hours_per_option: strategyScope.hours_per_option,
+          hours_per_request: $("stratOn").checked ? strategyScope.hours_per_request : 0
+        },
+        development_scope:{
+          selected: $("devOn").checked ? devScope.selected.map(x => x.label) : [],
+          hours_per_request: $("devOn").checked ? devScope.hours_per_request : 0
+        },
+        qualification:{
+          customer_name: qualification.customer_name,
+          users: qualification.users,
+          companies: qualification.companies,
+          regions: qualification.regions,
+          support_window: qualification.support_window,
+          active_timezones: qualification.active_timezones,
+          notes: qualification.notes,
+          confidence: qualificationResult.confidence,
+          flags: qualificationResult.flags
+        },
+        rows,
+        total_hours:coverageHours,
+        total_cost:totalCost
+      };
+    }
+
+    function bind(){
+      const ids = [
+        "licOn", "supOn", "devOn", "stratOn",
+        "showRates", "coverageRate", "rateLic", "rateSup", "rateDev", "rateStrat",
+        "licExecHours", "supExecHours", "devExecHours", "stratExecHours",
+        "devScopeInitial", "devScopeFrd", "devScopeSpecReview", "devScopeTechSpec",
+        "devScopeBuild", "devScopeTesting", "devScopeTraining", "devScopeWorkInstruction", "devScopeDeployment",
+        "stratScopeVision", "stratScopeImpact", "stratScopeRoadmap", "stratScopeComms",
+        "stratScopeTraining", "stratScopeGovernance", "stratScopeKpi", "stratScopeRisk", "stratScopeOptimization",
+        "qualCustomerName", "qualUsers", "qualCompanies", "qualRegions", "qualSupportWindow", "qualNotes",
+        "tzUk", "tzEurope", "tzMiddleEast", "tzNorthAmerica", "tzAsiaPacific",
+        "startTime", "hoursPerDay", "daysPerMonth", "weeksPerMonth",
+        "cad_1h", "dur_1h", "cad_4h", "dur_4h", "cad_same", "dur_same",
+        "cad_next", "dur_next", "cad_2d", "dur_2d", "cad_5d", "dur_5d"
+      ];
+      for (const id of ids){
+        $(id).addEventListener("input", render);
+        $(id).addEventListener("change", render);
+      }
+      document.body.addEventListener("change", (e) => {
+        if (e.target && e.target.name && ["licRt", "supRt", "devRt", "stratRt"].includes(e.target.name)) render();
+      });
+
+      for (const cfg of PANEL_CONFIGS){
+        $(cfg.toggleId).addEventListener("click", () => {
+          const panel = $(cfg.panelId);
+          const nextOpen = !panel.classList.contains("open");
+          setPanelOpen(cfg.toggleId, cfg.panelId, cfg.iconId, nextOpen);
+        });
+      }
+
+      // Initialize panels collapsed and inert by default.
+      for (const cfg of PANEL_CONFIGS){
+        setPanelOpen(cfg.toggleId, cfg.panelId, cfg.iconId, false);
+      }
+
+      setCustomerInfoCollapsed(false);
+      setServiceCardCollapsed(false);
+      setPlanningCardCollapsed(false);
+
+      $("customerInfoSubmit").addEventListener("click", () => {
+        setCustomerInfoCollapsed(!customerInfoCollapsed);
+      });
+      $("serviceCardSubmit").addEventListener("click", () => {
+        setServiceCardCollapsed(!serviceCardCollapsed);
+      });
+      $("planningCardSubmit").addEventListener("click", () => {
+        setPlanningCardCollapsed(!planningCardCollapsed);
+      });
+
+      $("copyBtn").addEventListener("click", async () => {
+        try{
+          await navigator.clipboard.writeText($("summary").textContent);
+          $("copyBtn").textContent = "Copied";
+          setTimeout(() => $("copyBtn").textContent = "Copy breakdown", 900);
+        } catch {
+          alert("Copy failed. Please copy text manually.");
+        }
+      });
+
+      $("jsonBtn").addEventListener("click", () => {
+        const payload = {
+          version:"calendar-requirements-v1",
+          generated_at:new Date().toISOString(),
+          result:render()
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type:"application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "calendar_requirements.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    initTheme();
+    bind();
+    render();
+  </script>
+</body>
+</html>
+
