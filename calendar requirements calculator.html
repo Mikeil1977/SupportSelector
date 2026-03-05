@@ -1134,6 +1134,13 @@
       return serviceName === "Support" ? "tickets" : "requests";
     }
 
+    function effortPerRequestForService(serviceName, devScope, strategyScope){
+      if (serviceName === "Development") return Math.max(0, devScope.hours_per_request);
+      if (serviceName === "Strategy") return Math.max(0, strategyScope.hours_per_request);
+      if (serviceName === "Support") return 2.5;
+      return 1;
+    }
+
     function displayServiceName(serviceName){
       const labels = {
         "Licence management": "Licensing & Environment Governance (NAV/BC)",
@@ -1357,9 +1364,7 @@
 
       for (const svc of selectedForCalc){
         const volumePerMonth = execHoursMap[svc.name] || 0;
-        const effortPerRequest =
-          svc.name === "Development" ? Math.max(0, devScope.hours_per_request) :
-          (svc.name === "Strategy" ? Math.max(0, strategyScope.hours_per_request) : 1);
+        const effortPerRequest = effortPerRequestForService(svc.name, devScope, strategyScope);
         const volumeUnit = volumeUnitForService(svc.name);
         const execHours = volumePerMonth * effortPerRequest;
         const execRate = rateMap[svc.name] || 0;
@@ -1535,9 +1540,7 @@
         lines.push("Service execution buckets:");
         for (const svc of selected){
           const volumePerMonth = execHoursMap[svc.name] || 0;
-          const effortPerRequest =
-            svc.name === "Development" ? Math.max(0, devScope.hours_per_request) :
-            (svc.name === "Strategy" ? Math.max(0, strategyScope.hours_per_request) : 1);
+          const effortPerRequest = effortPerRequestForService(svc.name, devScope, strategyScope);
           const volumeUnit = volumeUnitForService(svc.name);
           const execHours = volumePerMonth * effortPerRequest;
           const execRate = rateMap[svc.name] || 0;
